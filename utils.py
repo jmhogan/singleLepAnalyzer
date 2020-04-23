@@ -58,7 +58,7 @@ def readTreeNominal(sample,step1Dir):
 		os._exit(1)
 	rootfiles = EOSlist_root_files(step1Dir[23:])	
 
-	tChain = TChain('ljmet')
+	tChain = TChain('Events')#ljmet')
 	for i in range(0,len(rootfiles)):
 		if sample not in rootfiles[i]: continue
 		tChain.Add(rootfiles[i])
@@ -72,7 +72,7 @@ def readTreeShift(sample,shift,step1Dir):
 		os._exit(1)
 	rootfiles = EOSlist_root_files(step1Dir[23:])	
 
-	tChain = TChain('ljmet_'+shift)
+	tChain =  TChain('Events_'+shift)#TChain('ljmet_'+shift)
 	for i in range(0,len(rootfiles)):
 		if sample not in rootfiles[i]: continue
 		tChain.Add(rootfiles[i])

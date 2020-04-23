@@ -11,10 +11,10 @@ from utils import *
 gROOT.SetBatch(1)
 start_time = time.time()
 
-lumi=59.7 #for plots #56.1 #
+lumi=59.69 #for plots #56.1 #
 lumiInTemplates= str(targetlumi/1000).replace('.','p') # 1/fb
 
-iPlot='dnnLargest'
+iPlot='HT'
 if len(sys.argv)>1: iPlot=str(sys.argv[1])
 region='PS' #SR,TTCR,WJCR
 if len(sys.argv)>2: region=str(sys.argv[2])
@@ -22,25 +22,28 @@ isCategorized=False
 if len(sys.argv)>3: isCategorized=bool(eval(sys.argv[3]))
 pfix='templates'+region
 if not isCategorized: pfix='kinematics'+region
-pfix+='_Apr5'
+pfix+='_Take2'
 if len(sys.argv)>4: pfix=str(sys.argv[4])
 templateDir=os.getcwd()+'/'+pfix+'/'
 
-print 'Plotting',region,'is categorized?',isCategorized
+print 'Plotting',region,'; is categorized?',isCategorized
 
 isRebinned=''#_rebinned_stat0p3' #post for ROOT file names
 if len(sys.argv)>7: isRebinned='_rebinned_stat'+str(sys.argv[7])
 BRstr=''
-if isCategorized: BRstr='bW0p5_tZ0p25_tH0p25_'
+if isCategorized and 'BB' in pfix: BRstr='tW0p5_bZ0p25_bH0p25_'
+elif isCategorized: BRstr='bW0p5_tZ0p25_tH0p25_'
 saveKey = '' # tag for plot names
 
-sig1='TTM1200' #  choose the 1st signal to plot
-sig1leg='T#bar{T} (1.2 TeV)'
-sig2='TTM1500' #  choose the 2nd signal to plot
-sig2leg='T#bar{T} (1.5 TeV)'
+sig1='TTM1000' #  choose the 1st signal to plot
+sig1leg='T#bar{T} (1.0 TeV)'
+sig2='TTM1200' #  choose the 2nd signal to plot
+sig2leg='T#bar{T} (1.2 TeV)'
+
 drawNormalized = False # STACKS CAN'T DO THIS...bummer
 scaleSignals = True
-if not isCategorized and 'CR' not in region: scaleSignals = True
+if not isCategorized: scaleSignals = True
+if 'CR' in region: scaleSignals = False
 sigScaleFact = 400
 if 'SR' in region: sigScaleFact = 10
 if 'Nm1' in iPlot: sigScaleFact = sigScaleFact/5
@@ -49,12 +52,10 @@ print 'Scale factor = ',sigScaleFact
 tempsig='templates_'+iPlot+'_'+sig1+'_'+BRstr+lumiInTemplates+'fb'+isRebinned+'.root'#+'_Data18.root'
 
 bkgProcList = ['ewk','top','qcd']
-if '53' in sig1: bkgHistColors = {'top':kRed-9,'ewk':kBlue-7,'qcd':kOrange-5} #X53X53
-elif 'HTB' in sig1: bkgHistColors = {'ttbar':kGreen-3,'wjets':kPink-4,'top':kAzure+8,'ewk':kMagenta-2,'qcd':kOrange+5} #HTB
-else: bkgHistColors = {'top':kAzure+8,'ewk':kMagenta-2,'qcd':kOrange+5} #TT
+bkgHistColors = {'top':kAzure+8,'ewk':kMagenta-2,'qcd':kOrange+5} #TT
 
-if len(isRebinned)>0: systematicList = ['pileup','jec','muRFcorrdNewTop','muRFcorrdNewEwk','muRFcorrdNewQCD','btag','jsf','Teff','Tmis','Heff','Hmis','Zeff','Zmis','Weff','Wmis','Beff','Bmis','Jeff','Jmis','jer','ltag']
-else: systematicList = ['muRFcorrd','pileup','jsf','jec','btag','Teff','Tmis','Heff','Hmis','Zeff','Zmis','Weff','Wmis','Beff','Bmis','Jeff','Jmis','jer','ltag']
+if len(isRebinned)>0: systematicList = ['pileup', 'muRFcorrdNewTop']#,'prefire','jec','muRFcorrdNewTop','muRFcorrdNewEwk','muRFcorrdNewQCD','toppt','btag','jsf','Teff','Tmis','Heff','Hmis','Zeff','Zmis','Weff','Wmis','Beff','Bmis','Jeff','Jmis','jer','ltag']
+else: systematicList = ['muRFcorrd','pileup']#,'prefire','jsf','jec','btag','Teff','Tmis','Heff','Hmis','Zeff','Zmis','Weff','Wmis','Beff','Bmis','Jeff','Jmis','jer','ltag']
 
 doAllSys = True
 print 'doAllSys: ',doAllSys,'systematicList: ',systematicList
@@ -77,15 +78,9 @@ if compareShapes: blind,yLog=True,False
 histrange = {}
 
 isEMlist =['E','M']
-algolist = ['all']
-if 'algos' in region or 'SR' in region or isCategorized: 
-	#print 'I think algos is in the region'
-	algolist = ['DeepAK8']#,'BEST','DeepAK8DC']
 taglist = ['all']
 if isCategorized == True: 
-	taglist=['taggedbWbW','taggedtHbW','taggedtZbW','taggedtZHtZH','notV','notVtH','notVtZ','notVbW']
-	if '_' in pfix: taglist=['taggedbWbW','taggedtHbW','taggedtZbW','taggedtZHtZH','notVtH','notVtZ','notVbW',
-					'notV2pT','notV01T2pH','notV01T1H','notV1T0H','notV0T0H1pZ','notV0T0H0Z2pW','notV0T0H0Z01W']
+	taglist=['all']#'taggedbWbW','taggedtHbW','taggedtZbW','taggedtZHtZH','notV','notVtH','notVtZ','notVbW']
 	#isEMlist = ['L']
 	#taglist=['taggedbWbW','taggedtHbW','taggedtZbW','taggedtZHtZH','notVtZ','notVbW','notVtH',
 	#	 'notV3W0Z0H0T',
@@ -93,19 +88,14 @@ if isCategorized == True:
 	#	 'notV1W0Z0H0T','notV1W0Z1H0T','notV1W0Z0H1pT','notV1W0Z1H1pT','notV1W0Z2pH0pT','notV1W1Z0H0pT','notV1W1Z1pH0pT','notV1W2pZ0pH0pT',
 	#	 'notV0W0Z0H0T','notV0W0Z1H0T','notV0W0Z0H1pT','notV0W0Z1H1pT','notV0W0Z2pH0pT','notV0W1Z0H0pT','notV0W1Z1pH0pT','notV0W2pZ0pH0pT']
 
-print taglist, algolist
+print taglist
 
-tagList = []
-if isCategorized and iPlot != 'YLD':
-	for item in list(itertools.product(taglist,algolist)):
-		tag = [item[0],item[1]]
-		tagList.append(tag)
-else: tagList = list(itertools.product(taglist,algolist))
+tagList = taglist
 
 lumiSys = 0.023 # lumi uncertainty
-trigSys = 0.05 # trigger uncertainty, now really reco uncertainty
+trigSys = 0.03 # trigger uncertainty, now really reco uncertainty
 lepIdSys = 0.02 # lepton id uncertainty
-lepIsoSys = 0.02 # lepton isolation uncertainty
+lepIsoSys = 0.01 # lepton isolation uncertainty
 corrdSys = math.sqrt(lumiSys**2+trigSys**2+lepIdSys**2+lepIsoSys**2) #cheating while total e/m values are close
 
 def getNormUnc(hist,ibin,modelingUnc):
@@ -187,7 +177,7 @@ totBkgTemp1 = {}
 totBkgTemp2 = {}
 totBkgTemp3 = {}
 for tag in tagList:
-	tagStr=tag[0]+'_'+tag[1]
+	tagStr=tag
 	for isEM in isEMlist:
 		histPrefix=iPlot+'_'+lumiInTemplates+'fb_'
 		catStr='is'+isEM+'_'+tagStr
@@ -258,7 +248,7 @@ for tag in tagList:
 			errorDn = 0.
 			errorStatUp = gaeBkgHT.GetErrorYhigh(ibin-1)**2
 			errorStatDn = gaeBkgHT.GetErrorYlow(ibin-1)**2
-			errorNorm = 0.
+			errorNorm = (corrdSys**2)*(bkgHT.GetBinContent(ibin)**2)
 
 			if doAllSys:
 				for syst in systematicList:
@@ -420,14 +410,11 @@ for tag in tagList:
 		tagString = ''
 		algoString = ''
 		if isCategorized: tagString = tag[0]
-		if isCategorized or 'algos' in region: algoString = tag[1]
 		if tagString.endswith(', '): tagString = tagString[:-2]		
-		if algoString.endswith(', '): algoString = algoString[:-2]		
 		if iPlot != 'deltaRAK8': chLatex.DrawLatex(0.28, 0.84, flvString)
 		else: chLatex.DrawLatex(0.75,0.84,flvString)
 		if iPlot != 'YLD': 
-			chLatex.DrawLatex(0.28, 0.78, algoString)
-			chLatex.DrawLatex(0.28, 0.72, tagString)
+			chLatex.DrawLatex(0.28, 0.78, tagString)
 
 		if drawQCD: 
 			leg = TLegend(0.45,0.52,0.95,0.87)
@@ -707,7 +694,7 @@ for tag in tagList:
 		errorDn = 0.
 		errorStatUp = gaeBkgHTmerged.GetErrorYhigh(ibin-1)**2
 		errorStatDn = gaeBkgHTmerged.GetErrorYlow(ibin-1)**2
-		errorNorm = 0.
+		errorNorm = (corrdSys**2)*(bkgHTmerged.GetBinContent(ibin)**2)
 
 		if doAllSys:
 			for syst in systematicList:

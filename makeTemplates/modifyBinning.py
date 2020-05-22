@@ -29,14 +29,14 @@ start_time = time.time()
 # -- Use "removalKeys" to remove specific systematics from the output file.
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-iPlot='Tp2MDnn'
+iPlot='DnnTprime'
 if len(sys.argv)>1: iPlot=str(sys.argv[1])
-folder = 'templatesSR_Mar30NoPDF'
+folder = 'templatesSR_May2020TT_May9'
 if len(sys.argv)>2: folder=str(sys.argv[2])
 cutString = ''
 templateDir = os.getcwd()+'/'+folder+'/'+cutString
 print "templateDir: ",templateDir
-combinefile = 'yields_'+iPlot+'_41p530fb.root'
+combinefile = 'yields_'+iPlot+'_35p867fb.root'
 
 rebin4chi2 = False #include data in requirements
 rebinCombine = False #else rebins theta templates
@@ -44,7 +44,7 @@ rebinCombine = False #else rebins theta templates
 normalizeRENORM = False #only for signals
 normalizePDF    = False #only for signals
 #X53X53, TT, BB, HTB, etc --> this is used to identify signal histograms for combine templates when normalizing the pdf and muRF shapes to nominal!!!!
-sigName = 'BB' #MAKE SURE THIS WORKS FOR YOUR ANALYSIS PROPERLY!!!!!!!!!!!
+sigName = 'TT' #MAKE SURE THIS WORKS FOR YOUR ANALYSIS PROPERLY!!!!!!!!!!!
 massList = range(1000,1800+1,100)
 sigProcList = [sigName+'M'+str(mass) for mass in massList]
 if sigName=='TT': 
@@ -93,7 +93,10 @@ def findfiles(path, filtre):
             yield os.path.join(root, f)
 
 #Setup the selection of the files to be rebinned:          only those that aren't rebinned and are this plot
-rfiles = [file for file in findfiles(templateDir, '*.root') if 'rebinned' not in file and 'tW' in file and combinefile not in file and '_'+iPlot+'_' in file.split('/')[-1]]
+if 'BB' in folder: 
+	rfiles = [file for file in findfiles(templateDir, '*.root') if 'rebinned' not in file and 'tW' in file and combinefile not in file and '_'+iPlot+'_' in file.split('/')[-1]]
+if 'TT' in folder:
+        rfiles = [file for file in findfiles(templateDir, '*.root') if 'rebinned' not in file and 'bW' in file and combinefile not in file and '_'+iPlot+'_' in file.split('/')[-1]]
 print "templateDir: ",templateDir
 print "file: ",file
 print "combinefile: ",combinefile
@@ -467,7 +470,7 @@ for isEM in isEMlist:
 					else: yielderrtemp += (modelingSys[proc+'_'+modTag]*yieldtemp)**2
 					yielderrtemp += (corrdSys*yieldtemp)**2
 				yielderrtemp = math.sqrt(yielderrtemp)
-				print "yieldsAll: ",yieldsAll
+				#print "yieldsAll: ",yieldsAll
 				if proc==dataName: row.append(' & '+str(int(yieldsAll[histoPrefix+proc])))
 				else: row.append(' & '+str(round_sig(yieldtemp,5))+' $\pm$ '+str(round_sig(yielderrtemp,2)))
 			row.append('\\\\')

@@ -13,45 +13,44 @@ start_time = time.time()
 
 lumiStr = str(targetlumi/1000).replace('.','p') # 1/fb
 
-region='SR' #PS,SR,TTCR,WJCR
-isCategorized=True
+region='PS' #PS,SR,TTCR,WJCR
+isCategorized=False
 pfix='templates'+region
 if not isCategorized: pfix='kinematics'+region
-pfix+='_July2019_BB_Trained_MVA'
+pfix+='_May2020TT_May9'
 outDir = os.getcwd()+'/'+pfix+'/'
 
 scaleSignalXsecTo1pb = True # this has to be "True" if you are making templates for limit calculation!!!!!!!!
 scaleLumi = False
-lumiScaleCoeff = 41530./41298.
+lumiScaleCoeff = 35867./59690.
 doAllSys = True
 addCRsys = False
-systematicList = ['muRFcorrd','pileup','prefire','jec','btag','jsf','Teff','Tmis','Heff','Hmis','Zeff','Zmis','Weff','Wmis','Beff','Bmis','Jeff','Jmis','jer','ltag']#,'toppt']
-if isCategorized: systematicList = ['muRFcorrd','pileup','prefire','jec','btag','jsf','muR','muF','Teff','Tmis','Heff','Hmis','Zeff','Zmis','Weff','Wmis','Beff','Bmis','Jeff','Jmis','jer','ltag']#,'pdf','toppt',]
+systematicList = ['trigeffEl','trigeffMu','muRFcorrd','pileup','jec','btag','jsf','Teff','Tmis','Heff','Hmis','Zeff','Zmis','Weff','Wmis','Beff','Bmis','Jeff','Jmis','jer','ltag']# 'toppt','prefire'
+if isCategorized: systematicList = ['muRFcorrd','pileup','jec','btag','jsf','muR','muF','Teff','Tmis','Heff','Hmis','Zeff','Zmis','Weff','Wmis','Beff','Bmis','Jeff','Jmis','jer','ltag']# 'pdf','prefire','toppt',]
 normalizeRENORM_PDF = False #normalize the renormalization/pdf uncertainties to nominal templates --> normalizes signal processes only !!!!
 		       
 bkgGrupList = ['top','ewk','qcd']
-bkgProcList = ['TTJets','WJets','ZJets','qcd','TTV','T']
+bkgProcList = ['TTJets','WJets','ZJets','VV','qcd','TTV','T']
 bkgProcs = {}
 bkgProcs['WJets']  = ['WJetsMG400','WJetsMG600','WJetsMG800','WJetsMG1200','WJetsMG2500']#'WJetsMG200',
-bkgProcs['ZJets']  = ['DYMG200','DYMG400','DYMG600','DYMG800','DYMG1200','DYMG2500']
+bkgProcs['ZJets']  = ['DYMG400','DYMG600','DYMG800','DYMG1200','DYMG2500'] #'DYMG200',
 bkgProcs['VV']     = ['WW','WZ','ZZ']
 bkgProcs['TTV']    = ['TTWl','TTZl','TTHB','TTHnoB']#,'TTWq']#,'TTZq']
-bkgProcs['TTJets'] = ['TTJetsSemiLep0','TTJetsSemiLep700','TTJetsSemiLep1000','TTJetsHad0','TTJetsHad700','TTJetsHad1000',
-		      'TTJets2L2nu0','TTJets2L2nu700','TTJets2L2nu1000','TTJetsPH700mtt','TTJetsPH1000mtt']
-bkgProcs['T']      = ['Tt','Tbt','Ts','Tbs','TtW','TbtW']
-bkgProcs['qcd'] = ['QCDht500','QCDht700','QCDht1000','QCDht1500','QCDht2000']
+bkgProcs['TTJets'] = ['TTJetsPS0','TTJetsPS700','TTJetsPS1000','TTJets0','TTJets700','TTJets1000','TTJetsPH700mtt','TTJetsPH1000mtt']
+bkgProcs['T']      = ['Tt','Tbt','Ts','TtW','TbtW'] #'Tbs'
+bkgProcs['qcd'] = ['QCDht500','QCDht700','QCDht1000','QCDht1500','QCDht2000'] #'QCDht300',
 bkgProcs['top'] = bkgProcs['TTJets']+bkgProcs['T']+bkgProcs['TTV']
 bkgProcs['ewk'] = bkgProcs['WJets']+bkgProcs['ZJets']+bkgProcs['VV'] 
 dataList = [
-	'DataEABCDEF',
-	'DataMABCDEF'
+	'DataEBCDEFG',
+	'DataMBCDEFG'
 	#'Data18EG',
 	#'Data18MU',
 	]
 
 topptProcs = ['top','TTJets']
 
-whichSignal = 'BB' #HTB, TT, BB, or X53X53
+whichSignal = 'TT' #HTB, TT, BB, or X53X53
 massList = range(1000,1800+1,100)
 sigList = [whichSignal+'M'+str(mass) for mass in massList]
 if whichSignal=='TT': decays = ['BWBW','THTH','TZTZ','TZBW','THBW','TZTH'] #T' decays
@@ -92,6 +91,7 @@ if isCategorized:
 	#	 'notV0W0Z0H0T','notV0W0Z1H0T','notV0W0Z0H1pT','notV0W0Z1H1pT','notV0W0Z2pH0pT','notV0W1Z0H0pT','notV0W1Z1pH0pT','notV0W2pZ0pH0pT']
 
 catList = ['is'+item[0]+'_'+item[1]+'_'+item[2] for item in list(itertools.product(isEMlist,taglist,algolist))]
+print 'catList', catList
 #tagList = [item[0] for item in list(itertools.product(taglist))]
 
 lumiSys = 0.023 #lumi uncertainty
@@ -281,8 +281,12 @@ def makeThetaCats(datahists,sighists,bkghists,discriminant):
 		table.append(['YIELDS']+[proc for proc in bkgProcList+['data']])
 		for cat in catList:
 			row = [cat]
+			#print str(yieldTable[histoPrefix][proc]
 			histoPrefix=discriminant+'_'+lumiStr+'fb_'+cat
-			for proc in bkgProcList+['data']: row.append(str(yieldTable[histoPrefix][proc])+' $\pm$ '+str(yieldStatErrTable[histoPrefix][proc]))
+			#print str(histoPrefix),str(proc)
+			for proc in bkgProcList+['data']: 
+				row.append(str(yieldTable[histoPrefix][proc])+' $\pm$ '+str(yieldStatErrTable[histoPrefix][proc]))
+				print str(proc)
 			table.append(row)			
 		table.append(['break'])
 		table.append(['break'])
@@ -468,17 +472,19 @@ for iPlot in iPlotList:
 	if scaleLumi:
 		for key in bkghists.keys(): bkghists[key].Scale(lumiScaleCoeff)	    		
 		for key in sighists.keys(): sighists[key].Scale(lumiScaleCoeff)
-
+	#print sighists.keys()
 	checkprint = False
 	print 'sighists check:'
 	for key in sighists:
 		if 'MET_' in key and 'TTM800' in key: print key
 	print "       MAKING CATEGORIES FOR TOTAL SIGNALS ..."
 	if whichSignal=='BB': iPlot=iPlot.replace('Tp','Bp')
-	#try:
-	makeThetaCats(datahists,sighists,bkghists,iPlot)
-	#except:
-	#	print 'makeThetaCats failed for iPlot:',iPlot
-	#	pass
+	try:
+		makeThetaCats(datahists,sighists,bkghists,iPlot)
+	except Exception as e:
+		print(type(e))
+		print(e)
+		print 'makeThetaCats failed for iPlot:',iPlot
+		pass
 
 print("--- %s minutes ---" % (round((time.time() - start_time)/60,2)))

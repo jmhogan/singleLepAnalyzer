@@ -36,19 +36,19 @@ samples = {
 #'TTJetsPH':'TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8',
 
 'TTJetsHad':'TTToHadronic_TuneCP5_13TeV-powheg-pythia8',
-#'TTJetsHad0':'TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8_Mtt0to700',
-#'TTJetsHad700':'TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8_Mtt700to1000',
-#'TTJetsHad1000':'TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8_Mtt1000toInf',
+'TTJetsHad0':'TTToHadronic_TuneCP5_13TeV-powheg-pythia8_Mtt0to700',
+'TTJetsHad700':'TTToHadronic_TuneCP5_13TeV-powheg-pythia8_Mtt700to1000',
+'TTJetsHad1000':'TTToHadronic_TuneCP5_13TeV-powheg-pythia8_Mtt1000toInf',
 
 'TTJetsSemiLep':'TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8',
-#'TTJetsSemiLep0':'TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8_Mtt0to700',
-#'TTJetsSemiLep700':'TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8_Mtt700to1000',
-#'TTJetsSemiLep1000':'TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8_Mtt1000toInf',
+'TTJetsSemiLep0':'TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_Mtt0to700',
+'TTJetsSemiLep700':'TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_Mtt700to1000',
+'TTJetsSemiLep1000':'TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_Mtt1000toInf',
 
 'TTJets2L2nu':'TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8',
-#'TTJets2L2nu0':'TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8_Mtt0to700',
-#'TTJets2L2nu700':'TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8_Mtt700to1000',
-#'TTJets2L2nu1000':'TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8_Mtt1000toInf',
+'TTJets2L2nu0':'TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_Mtt0to700',
+'TTJets2L2nu700':'TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_Mtt700to1000',
+'TTJets2L2nu1000':'TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_Mtt1000toInf',
 
 #'TTJetsPH700mtt':'TT_Mtt-700to1000_TuneCP5_PSweights_13TeV-powheg-pythia8',
 #'TTJetsPH1000mtt':'TT_Mtt-1000toInf_TuneCP5_PSweights_13TeV-powheg-pythia8',

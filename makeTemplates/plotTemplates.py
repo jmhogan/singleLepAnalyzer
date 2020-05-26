@@ -14,38 +14,37 @@ start_time = time.time()
 lumi=59.69 #for plots #56.1 #
 lumiInTemplates= str(targetlumi/1000).replace('.','p') # 1/fb
 
-iPlot='HT'
+iPlot='tmassBins'
 if len(sys.argv)>1: iPlot=str(sys.argv[1])
-region='PS' #SR,TTCR,WJCR
+region='SR' #SR,TTCR,WJCR
 if len(sys.argv)>2: region=str(sys.argv[2])
-isCategorized=False
+isCategorized=True
 if len(sys.argv)>3: isCategorized=bool(eval(sys.argv[3]))
 pfix='templates'+region
 if not isCategorized: pfix='kinematics'+region
-pfix+='_Take2'
+pfix+='_050720'
 if len(sys.argv)>4: pfix=str(sys.argv[4])
 templateDir=os.getcwd()+'/'+pfix+'/'
 
-print 'Plotting',region,'; is categorized?',isCategorized
+print 'Plotting',region,'is categorized?',isCategorized
 
-isRebinned=''#_rebinned_stat0p3' #post for ROOT file names
+isRebinned='' #post for ROOT file names
 if len(sys.argv)>7: isRebinned='_rebinned_stat'+str(sys.argv[7])
 BRstr=''
-if isCategorized and 'BB' in pfix: BRstr='tW0p5_bZ0p25_bH0p25_'
-elif isCategorized: BRstr='bW0p5_tZ0p25_tH0p25_'
+#if isCategorized and 'BB' in pfix: BRstr='tW0p5_bZ0p25_bH0p25_'
+#elif isCategorized: BRstr='bW0p5_tZ0p25_tH0p25_'
 saveKey = '' # tag for plot names
 
-sig1='TTM1000' #  choose the 1st signal to plot
-sig1leg='T#bar{T} (1.0 TeV)'
-sig2='TTM1200' #  choose the 2nd signal to plot
-sig2leg='T#bar{T} (1.2 TeV)'
+sig1='TTM1200' #  choose the 1st signal to plot
+sig1leg='T#bar{T} (1.2 TeV)'
+sig2='TTM1500' #  choose the 2nd signal to plot
+sig2leg='T#bar{T} (1.5 TeV)'
 
 drawNormalized = False # STACKS CAN'T DO THIS...bummer
 scaleSignals = True
-if not isCategorized: scaleSignals = True
-if 'CR' in region: scaleSignals = False
+if not isCategorized and 'CR' not in region: scaleSignals = True
 sigScaleFact = 400
-if 'SR' in region: sigScaleFact = 10
+if 'SR' in region: sigScaleFact = 3
 if 'Nm1' in iPlot: sigScaleFact = sigScaleFact/5
 print 'Scaling signals?',scaleSignals
 print 'Scale factor = ',sigScaleFact
@@ -54,8 +53,8 @@ tempsig='templates_'+iPlot+'_'+sig1+'_'+BRstr+lumiInTemplates+'fb'+isRebinned+'.
 bkgProcList = ['ewk','top','qcd']
 bkgHistColors = {'top':kAzure+8,'ewk':kMagenta-2,'qcd':kOrange+5} #TT
 
-if len(isRebinned)>0: systematicList = ['pileup', 'muRFcorrdNewTop']#,'prefire','jec','muRFcorrdNewTop','muRFcorrdNewEwk','muRFcorrdNewQCD','toppt','btag','jsf','Teff','Tmis','Heff','Hmis','Zeff','Zmis','Weff','Wmis','Beff','Bmis','Jeff','Jmis','jer','ltag']
-else: systematicList = ['muRFcorrd','pileup']#,'prefire','jsf','jec','btag','Teff','Tmis','Heff','Hmis','Zeff','Zmis','Weff','Wmis','Beff','Bmis','Jeff','Jmis','jer','ltag']
+if len(isRebinned)>0: systematicList = ['pileup', 'toppt','muRFcorrdNewTop','muRFcorrdNewEwk','muRFcorrdNewQCD']#,'prefire','jec','muRFcorrdNewTop',,'toppt','btag','jsf','Teff','Tmis','Heff','Hmis','Zeff','Zmis','Weff','Wmis','Beff','Bmis','Jeff','Jmis','jer','ltag']
+else: systematicList = ['muRFcorrd','pileup','toppt']#,'prefire','jsf','jec','btag','Teff','Tmis','Heff','Hmis','Zeff','Zmis','Weff','Wmis','Beff','Bmis','Jeff','Jmis','jer','ltag']
 
 doAllSys = True
 print 'doAllSys: ',doAllSys,'systematicList: ',systematicList
@@ -65,9 +64,11 @@ if len(isRebinned)>0 and 'stat1p1' not in isRebinned: doNormByBinWidth = True
 doOneBand = True
 # MAY NEED TO RE-INDENT PART/ALL OF CODE FROM HERE TO CORRESPONDING COMMENT!!!!!
 if not doAllSys: doOneBand = True # Don't change this!
-blind = False
+blind = True
 if len(sys.argv)>5: blind=bool(eval(sys.argv[5]))
 yLog  = False
+xLog = False
+if iPlot == 'tmassBins': xLog = True
 if len(sys.argv)>6: yLog=bool(eval(sys.argv[6]))
 print 'Plotting blind?',blind,' yLog?',yLog
 if yLog: scaleSignals = False
@@ -80,7 +81,7 @@ histrange = {}
 isEMlist =['E','M']
 taglist = ['all']
 if isCategorized == True: 
-	taglist=['all']#'taggedbWbW','taggedtHbW','taggedtZbW','taggedtZHtZH','notV','notVtH','notVtZ','notVbW']
+	taglist=['0W','1pW']#'taggedbWbW','taggedtHbW','taggedtZbW','taggedtZHtZH','notV','notVtH','notVtZ','notVbW']
 	#isEMlist = ['L']
 	#taglist=['taggedbWbW','taggedtHbW','taggedtZbW','taggedtZHtZH','notVtZ','notVbW','notVtH',
 	#	 'notV3W0Z0H0T',
@@ -93,7 +94,7 @@ print taglist
 tagList = taglist
 
 lumiSys = 0.023 # lumi uncertainty
-trigSys = 0.03 # trigger uncertainty, now really reco uncertainty
+trigSys = 0.05 # trigger uncertainty, now really reco uncertainty
 lepIdSys = 0.02 # lepton id uncertainty
 lepIsoSys = 0.01 # lepton isolation uncertainty
 corrdSys = math.sqrt(lumiSys**2+trigSys**2+lepIdSys**2+lepIsoSys**2) #cheating while total e/m values are close
@@ -107,7 +108,7 @@ def getNormUnc(hist,ibin,modelingUnc):
 def formatUpperHist(histogram,th1hist):
 	histogram.GetXaxis().SetLabelSize(0)
 	lowside = th1hist.GetBinLowEdge(1)
-	if iPlot=='ST': lowside = th1hist.GetBinLowEdge(8)-50.0
+	if iPlot=='ST': lowside = th1hist.GetBinLowEdge(8)-50.0	
 	highside = th1hist.GetBinLowEdge(th1hist.GetNbinsX()+1)
 	if iPlot=='dnnLargest': highside = th1hist.GetBinLowEdge(7)-0.1
 	histogram.GetXaxis().SetRangeUser(lowside,highside)
@@ -143,6 +144,7 @@ def formatUpperHist(histogram,th1hist):
 		if iPlot=='YLD': 
 			histogram.SetMaximum(200*histogram.GetMaximum())
 			histogram.SetMinimum(0.1)
+	if xLog: uPad.SetLogx()
 
 		
 def formatLowerHist(histogram):
@@ -165,6 +167,9 @@ def formatLowerHist(histogram):
 	elif yLog and doNormByBinWidth: histogram.GetYaxis().SetRangeUser(0.1,1.9)
 	else: histogram.GetYaxis().SetRangeUser(0.1,1.9)
 	histogram.GetYaxis().CenterTitle()
+
+	if xLog: lPad.SetLogx()
+
 
 RFile1 = TFile(templateDir+tempsig.replace(sig1,sig1))
 print templateDir+tempsig.replace(sig1,sig1)
@@ -409,7 +414,7 @@ for tag in tagList:
 		if isEM=='M': flvString+='#mu+jets'
 		tagString = ''
 		algoString = ''
-		if isCategorized: tagString = tag[0]
+		if isCategorized: tagString = tag
 		if tagString.endswith(', '): tagString = tagString[:-2]		
 		if iPlot != 'deltaRAK8': chLatex.DrawLatex(0.28, 0.84, flvString)
 		else: chLatex.DrawLatex(0.75,0.84,flvString)
@@ -832,14 +837,11 @@ for tag in tagList:
 	flvString = 'e/#mu+jets'
 	tagString = ''
 	algoString = ''
-	if isCategorized: tagString = tag[0]
-	if isCategorized or 'algos' in region: algoString = tag[1]
+	if isCategorized: tagString = tag
 	if tagString.endswith(', '): tagString = tagString[:-2]
-	if algoString.endswith(', '): algoString = algoString[:-2]
 	if iPlot != 'deltaRAK8': chLatexmerged.DrawLatex(0.28, 0.85, flvString)
 	else: chLatexmerged.DrawLatex(0.75,0.85,flvString)
 	if iPlot != 'YLD':
-		chLatexmerged.DrawLatex(0.28, 0.78, algoString)
 		chLatexmerged.DrawLatex(0.28, 0.72, tagString)
 
 	if drawQCDmerged: 

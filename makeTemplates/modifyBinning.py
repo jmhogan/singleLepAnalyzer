@@ -31,7 +31,7 @@ start_time = time.time()
 
 iPlot='HT'
 if len(sys.argv)>1: iPlot=str(sys.argv[1])
-folder = 'templatesCR_Aug2019TTtest2'
+folder = 'templatesAltSR_051720'
 if len(sys.argv)>2: folder=str(sys.argv[2])
 cutString = ''
 templateDir = os.getcwd()+'/'+folder+'/'+cutString
@@ -41,11 +41,11 @@ combinefile = 'yields_'+iPlot+'_59p69fb.root'
 rebin4chi2 = False #include data in requirements
 rebinCombine = False #else rebins theta templates
 
-normalizeRENORM = False #only for signals
+normalizeRENORM = True #only for signals
 normalizePDF    = False #only for signals
 #X53X53, TT, BB, HTB, etc --> this is used to identify signal histograms for combine templates when normalizing the pdf and muRF shapes to nominal!!!!
 sigName = 'TT' #MAKE SURE THIS WORKS FOR YOUR ANALYSIS PROPERLY!!!!!!!!!!!
-massList = [1000,1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800]
+massList = [900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800]
 sigProcList = [sigName+'M'+str(mass) for mass in massList]
 if sigName=='TT': 
 	sigProcList = [sigName+'M'+str(mass) for mass in massList]
@@ -69,8 +69,8 @@ else: #theta
 addCRsys = False
 addShapes = True
 lumiSys = math.sqrt(0.023**2) #lumi uncertainty plus higgs prop
-eltrigSys = 0.03 #electron trigger uncertainty
-mutrigSys = 0.03 #muon trigger uncertainty
+eltrigSys = 0.05 #electron trigger uncertainty
+mutrigSys = 0.05 #muon trigger uncertainty
 elIdSys = 0.02 #electron id uncertainty
 muIdSys = 0.02 #muon id uncertainty
 elIsoSys = 0.01 #electron isolation uncertainty
@@ -93,10 +93,8 @@ def findfiles(path, filtre):
             yield os.path.join(root, f)
 
 #Setup the selection of the files to be rebinned:          only those that aren't rebinned and are this plot
-if 'BB' in folder: 
-	rfiles = [file for file in findfiles(templateDir, '*.root') if 'rebinned' not in file and 'tW' in file and combinefile not in file and '_'+iPlot+'_' in file.split('/')[-1]]
-if 'TT' in folder:
-        rfiles = [file for file in findfiles(templateDir, '*.root') if 'rebinned' not in file and 'bW' in file and combinefile not in file and '_'+iPlot+'_' in file.split('/')[-1]]
+rfiles = [file for file in findfiles(templateDir, '*.root') if 'rebinned' not in file and combinefile not in file and '_'+iPlot+'_' in file.split('/')[-1]]
+
 print "templateDir: ",templateDir
 print "file: ",file
 print "combinefile: ",combinefile
@@ -106,7 +104,7 @@ if rebinCombine: rfiles = [templateDir+'/'+combinefile]
 
 #Open the lowest mass signal for consistency
 for rfile in rfiles:
-	if 'TTM1100' in rfile or 'BBM1100' in rfile: tfile = TFile(rfile)
+	if 'TTM900' in rfile or 'BBM900' in rfile: tfile = TFile(rfile)
 print tfile
 datahists = [k.GetName() for k in tfile.GetListOfKeys() if '__'+dataName in k.GetName()]
 print datahists
@@ -122,6 +120,7 @@ for hist in datahists:
 totBkgHists = {}
 for hist in datahists:
 	channel = hist[hist.find('fb_')+3:hist.find('__')]
+	print 'Getting hist:', str(hist.replace('__'+dataName,'__'+bkgProcList[0]))
 	totBkgHists[channel]=tfile.Get(hist.replace('__'+dataName,'__'+bkgProcList[0])).Clone()
 	for proc in bkgProcList:
 		if proc == bkgProcList[0]: continue
@@ -226,8 +225,7 @@ for chn in totBkgHists.keys():
 
 	## Ignore all this if stat is > 1
 	if stat>1.0:
-		if 'notV' in chn: xbinsListTemp[chn] = [tfile.Get(datahists[0]).GetXaxis().GetBinUpEdge(tfile.Get(datahists[0]).GetXaxis().GetNbins())]
-		else: xbinsListTemp[chn] = [tfile.Get(datahists[4]).GetXaxis().GetBinUpEdge(tfile.Get(datahists[4]).GetXaxis().GetNbins())]
+		xbinsListTemp[chn] = [tfile.Get(datahists[0]).GetXaxis().GetBinUpEdge(tfile.Get(datahists[0]).GetXaxis().GetNbins())]
 		for iBin in range(1,Nbins+1): 
 			xbinsListTemp[chn].append(totBkgHists[chn].GetXaxis().GetBinLowEdge(Nbins+1-iBin))
 		xbinsListTemp[chn.replace('isE','isM')] = xbinsListTemp[chn]
@@ -250,16 +248,11 @@ for key in xbinsList.keys(): xbins[key] = array('d', xbinsList[key])
 #os._exit(1)
 
 ### Updated for 2017, JH August 2019
-muSFsUp = {'TTM1000':0.744,'TTM1100':0.747,'TTM1200':0.742,'TTM1300':0.741,'TTM1400':0.738,'TTM1500':0.740,'TTM1600':0.735,'TTM1700':0.721,'TTM1800':0.746}
-muSFsDn = {'TTM1000':1.312,'TTM1100':1.306,'TTM1200':1.315,'TTM1300':1.316,'TTM1400':1.322,'TTM1500':1.319,'TTM1600':1.329,'TTM1700':1.354,'TTM1800':1.311}
+muSFsUp = {'TTM900':0.744,'TTM1000':0.744,'TTM1100':0.747,'TTM1200':0.742,'TTM1300':0.741,'TTM1400':0.738,'TTM1500':0.740,'TTM1600':0.735,'TTM1700':0.721,'TTM1800':0.746}
+muSFsDn = {'TTM900':1.312,'TTM1000':1.312,'TTM1100':1.306,'TTM1200':1.315,'TTM1300':1.316,'TTM1400':1.322,'TTM1500':1.319,'TTM1600':1.329,'TTM1700':1.354,'TTM1800':1.311}
 pdfSFsUp = {'TTM1000':0.997,'TTM1100':0.996,'TTM1200':0.995,'TTM1300':0.994,'TTM1400':0.991,'TTM1500':0.986,'TTM1600':0.984,'TTM1700':0.980,'TTM1800':0.966}
 pdfSFsDn = {'TTM1000':1.005,'TTM1100':1.007,'TTM1200':1.008,'TTM1300':1.011,'TTM1400':1.015,'TTM1500':1.022,'TTM1600':1.027,'TTM1700':1.031,'TTM1800':1.050}
 
-if sigName == 'BB':
-	muSFsUp = {'BBM1000':0.742,'BBM1100':0.743,'BBM1200':0.742,'BBM1300':0.741,'BBM1400':0.739,'BBM1500':0.735,'BBM1600':0.735,'BBM1700':0.733,'BBM1800':0.731}
-	muSFsDn = {'BBM1000':1.315,'BBM1100':1.314,'BBM1200':1.316,'BBM1300':1.318,'BBM1400':1.321,'BBM1500':1.329,'BBM1600':1.329,'BBM1700':1.331,'BBM1800':1.337}
-	pdfSFsUp = {'BBM1000':0.997,'BBM1100':0.997,'BBM1200':0.996,'BBM1300':0.994,'BBM1400':0.991,'BBM1500':0.987,'BBM1600':0.984,'BBM1700':0.979,'BBM1800':0.970}
-	pdfSFsDn = {'BBM1000':1.005,'BBM1100':1.006,'BBM1200':1.008,'BBM1300':1.011,'BBM1400':1.015,'BBM1500':1.019,'BBM1600':1.027,'BBM1700':1.037,'BBM1800':1.049}
 
 iRfile=0
 yieldsAll = {}
@@ -291,15 +284,15 @@ for rfile in rfiles:
 			if any([item in hist and not removalKeys[item] for item in removalKeys.keys()]): continue
 			rebinnedHists[hist].Write()
 
-			if 'W0p5' in rfile:
-				yieldHistName = hist
-				if not rebinCombine: yieldHistName = hist.replace('_sig','_'+rfile.split('_')[-5]) ### ASSUMING BR IS IN FILE NAME
+			#if 'W0p5' in rfile:
+			yieldHistName = hist
+			if not rebinCombine: yieldHistName = hist.replace('_sig','_'+rfile.split('_')[-2]) ### ASSUMING BR IS IN FILE NAME
 
-				yieldsAll[yieldHistName] = rebinnedHists[hist].Integral()
-				yieldsErrsAll[yieldHistName] = 0.
-				for ibin in range(1,rebinnedHists[hist].GetXaxis().GetNbins()+1):
-					yieldsErrsAll[yieldHistName] += rebinnedHists[hist].GetBinError(ibin)**2
-				yieldsErrsAll[yieldHistName] = math.sqrt(yieldsErrsAll[yieldHistName])
+			yieldsAll[yieldHistName] = rebinnedHists[hist].Integral()
+			yieldsErrsAll[yieldHistName] = 0.
+			for ibin in range(1,rebinnedHists[hist].GetXaxis().GetNbins()+1):
+				yieldsErrsAll[yieldHistName] += rebinnedHists[hist].GetBinError(ibin)**2
+			yieldsErrsAll[yieldHistName] = math.sqrt(yieldsErrsAll[yieldHistName])
 
 			
 		##Check for empty signal bins
@@ -398,7 +391,6 @@ taglist = []
 for chn in channels:
 	if chn.split('_')[0+rebinCombine] not in isEMlist: isEMlist.append(chn.split('_')[0+rebinCombine])
 	if chn.split('_')[1+rebinCombine] not in taglist: taglist.append(chn.split('_')[1+rebinCombine])
-	if chn.split('_')[2+rebinCombine] not in algolist: algolist.append(chn.split('_')[2+rebinCombine])
 
 print "List of systematics for "+bkgProcList[0]+" process and "+channels[0]+" channel:"
 print "        ",sorted([hist[hist.find(bkgProcList[0])+len(bkgProcList[0])+2:hist.find(upTag)] for hist in yieldsAll.keys() if channels[0] in hist and '__'+bkgProcList[0]+'__' in hist and upTag in hist])
@@ -423,7 +415,7 @@ table = []
 for isEM in isEMlist:
 	if isEM=='isE': corrdSys = elcorrdSys
 	if isEM=='isM': corrdSys = mucorrdSys
-	for tag in ['tagged','notV']:
+	for tag in ['W']:
 		table.append(['break'])
 		table.append(['',isEM+'_'+tag+'_yields'])
 		table.append(['break'])
@@ -469,13 +461,12 @@ for isEM in isEMlist:
 					else: yielderrtemp += (modelingSys[proc+'_'+modTag]*yieldtemp)**2
 					yielderrtemp += (corrdSys*yieldtemp)**2
 				yielderrtemp = math.sqrt(yielderrtemp)
-				print "yieldsAll: ",yieldsAll
 				if proc==dataName: row.append(' & '+str(int(yieldsAll[histoPrefix+proc])))
 				else: row.append(' & '+str(round_sig(yieldtemp,5))+' $\pm$ '+str(round_sig(yielderrtemp,2)))
 			row.append('\\\\')
 			table.append(row)
 			
-for tag in ['tagged','notV']:
+for tag in ['W']:
 	table.append(['break'])
 	table.append(['','isL_'+tag+'_yields'])
 	table.append(['break'])

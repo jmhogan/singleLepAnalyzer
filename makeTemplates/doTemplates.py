@@ -13,32 +13,31 @@ start_time = time.time()
 
 lumiStr = str(targetlumi/1000).replace('.','p') # 1/fb
 
-region='CR' #PS,CR,SR
+region='PS' #PS,CR,SR
 isCategorized=False
 pfix='templates'+region
 if not isCategorized: pfix='kinematics'+region
-pfix+='_Take3'
-outDir = os.getcwd()+'/'+pfix+'/'
+pfix+='_051720'
+outDir = os.getcwd()+'/'+pfix+''
 
 scaleSignalXsecTo1pb = True # this has to be "True" if you are making templates for limit calculation!!!!!!!!
 scaleLumi = False
 lumiScaleCoeff = 41530./41298.
 doAllSys = True
 addCRsys = False
-systematicList = ['muRFcorrd','pileup']#,'jec','btag','jsf','jer','ltag']#,'toppt']
-if isCategorized: systematicList = ['muRFcorrd','pileup']#,'jec','btag','jsf','muR','muF','jer','ltag']#,'pdf','toppt',]
+systematicList = ['muRFcorrd','pileup','toppt']#,'jec','btag','jsf','jer','ltag']#,'toppt']
+if isCategorized: systematicList = ['muR','muF','muRFcorrd','pileup','toppt']#,'jec','btag','jsf','muR','muF','jer','ltag']#,'pdf','toppt',]
 normalizeRENORM_PDF = False #normalize the renormalization/pdf uncertainties to nominal templates --> normalizes signal processes only !!!!
 		       
 bkgGrupList = ['top','ewk','qcd']
-bkgProcList = ['TTJets','WJets','ZJets','qcd','T']#'TTV',
+bkgProcList = ['TTJets','WJets','ZJets','qcd','T'] #didn't run TTV or VV samples
 bkgProcs = {}
 bkgProcs['WJets']  = ['WJetsMG200','WJetsMG400','WJetsMG600','WJetsMG800','WJetsMG1200','WJetsMG2500']#
 bkgProcs['ZJets']  = ['DYMG200','DYMG400','DYMG600','DYMG800','DYMG1200','DYMG2500']
 bkgProcs['VV']     = ['WW','WZ','ZZ']
 bkgProcs['TTV']    = ['TTWl','TTZl','TTHB','TTHnoB']#,'TTWq']#,'TTZq']
 bkgProcs['TTJets'] = ['TTJetsSemiLep','TTJetsHad','TTJets2L2nu']
-#bkgProcs['TTJets'] = ['TTJetsSemiLep0','TTJetsSemiLep700','TTJetsSemiLep1000','TTJetsHad0','TTJetsHad700','TTJetsHad1000',
-#		      'TTJets2L2nu0','TTJets2L2nu700','TTJets2L2nu1000','TTJetsPH700mtt','TTJetsPH1000mtt']
+#bkgProcs['TTJets'] = ['TTJetsSemiLep0','TTJetsSemiLep700','TTJetsSemiLep1000','TTJetsHad0','TTJetsHad700','TTJetsHad1000','TTJets2L2nu0','TTJets2L2nu700','TTJets2L2nu1000']#,'TTJetsPH700mtt','TTJetsPH1000mtt']
 bkgProcs['T']      = ['Tt','Tbt','Ts','TtW','TbtW']#'Tbs',
 bkgProcs['qcd'] = ['QCDht200','QCDht300','QCDht500','QCDht700','QCDht1000','QCDht1500','QCDht2000']
 bkgProcs['top'] = bkgProcs['TTJets']+bkgProcs['T']#+bkgProcs['TTV']
@@ -51,12 +50,12 @@ dataList = [
 topptProcs = ['top','TTJets']
 
 whichSignal = 'TT'
-massList = range(1000,1800+1,100)
+massList = range(900,1800+1,100)
 sigList = [whichSignal+'M'+str(mass) for mass in massList]
 if whichSignal=='TT': decays = [''] #'BWBW','THTH','TZTZ','TZBW','THBW','TZTH'] #T' decays
 
 doBRScan = False ## should be able to leave it always false
-if isCategorized and 'SR' in region: doBRScan = True
+#if isCategorized and 'SR' in region: doBRScan = True
 BRs={}
 if whichSignal=='TT':
 	BRs['BW']=[1.0]
@@ -67,12 +66,12 @@ if not doBRScan: nBRconf=1
 
 isEMlist =['E','M']
 taglist = ['all']
-if isCategorized: taglist  ['0W','1pW']
+if isCategorized: taglist = ['0W','1pW']
 catList = ['is'+item[0]+'_'+item[1] for item in list(itertools.product(isEMlist,taglist))]
 
 lumiSys = 0.023 #lumi uncertainty
-eltrigSys = 0.03 #electron trigger uncertainty
-mutrigSys = 0.03 #muon trigger uncertainty
+eltrigSys = 0.05 #electron trigger uncertainty
+mutrigSys = 0.05 #muon trigger uncertainty
 elIdSys = 0.02 #electron id uncertainty
 muIdSys = 0.02 #muon id uncertainty
 elIsoSys = 0.01 #electron isolation uncertainty
@@ -88,7 +87,6 @@ def makeThetaCats(datahists,sighists,bkghists,discriminant):
 	yieldTable = {}
 	yieldStatErrTable = {}
 	for cat in catList:
-		
 		histoPrefix=discriminant+'_'+lumiStr+'fb_'+cat
 		yieldTable[histoPrefix]={}
 		yieldStatErrTable[histoPrefix]={}
@@ -426,8 +424,10 @@ for iPlot in iPlotList:
 	datahists = {} 
 	bkghists  = {}
 	sighists  = {}
-
+	
 	print "LOADING DISTRIBUTION: "+iPlot
+	if 'fittedJetMass' in iPlot:
+		continue
 	for cat in catList:
 		print "         ",cat[2:]
 		datahists.update(pickle.load(open(outDir+'/'+cat[2:]+'/datahists_'+iPlot+'.p','rb')))

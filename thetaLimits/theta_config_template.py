@@ -3,7 +3,7 @@ from operator import itemgetter,attrgetter
 
 input = 'FILE'
 
-rFileName = input.split('/')[-1][:-5]+'_DeepAK8'
+rFileName = input.split('/')[-1][:-5]
                                                                           
 def get_model():
     model = build_model_from_rootfile(input,include_mc_uncertainties=True,histogram_filter = (lambda s: s.count('Best')==0))

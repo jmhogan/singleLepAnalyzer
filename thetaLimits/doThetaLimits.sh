@@ -20,7 +20,7 @@ python -u theta/utils2/theta-auto.py ${configfile}.py
 
 rm *.root
 
-tar -zcf htmlout_${configfile}.tar htmlout_${configfile}_DeepAK8/
+tar -zcf htmlout_${configfile}.tar htmlout_${configfile}/
 
 echo "Files I expect to come back:"
 ls -l

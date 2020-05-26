@@ -1,7 +1,7 @@
 import os,sys,fnmatch
 
-runDir='/uscms_data/d3/cholz/CMSSW_10_2_10/src/singleLepAnalyzer/'
-templateDir=runDir+'makeTemplates/templatesSR_July2019_With_Uncertainties'#No slash at the end!
+runDir='/uscms_data/d3/jmanagan/ErinHitFit/CMSSW_10_2_10/src/bwbw_2018/'
+templateDir=runDir+'makeTemplates/templatesAltSR_051720'#No slash at the end!
 postfix = ''
 
 thetaConfigTemp = os.getcwd()+'/theta_config_template.py'
@@ -14,13 +14,16 @@ thetaConfigTemp = os.getcwd()+'/theta_config_template.py'
 #        'isM_notVbW_DeepAK8','isM_notVtZ_DeepAK8','isM_notVtH_DeepAK8','isM_notV_DeepAK8',
 #        ]
 
-toFilter0 = ['_toppt_','_muRFcorrd_'] #always remove in case they are in templates
+toFilter0 = ['_muRFcorrd_'] #always remove in case they are in templates
 toFilter0 = [item for item in toFilter0]
 
 limitConfs = {#'<limit type>':[filter list]
+    'HT':[],
+    #'tmass':[],
+    #'tmassBins':[],
     #'ST':[],
     #'Tp2Mass':[],
-    'Tp2MST':[],
+    #'Tp2MST':[],
     #'Tp2MDnn':[],
     #'DnnTprime':[],
     #'isE':['isM'], #only electron channel
@@ -29,10 +32,10 @@ limitConfs = {#'<limit type>':[filter list]
     }
 
 limitType = ''  #label for bookkeeping
-outputDir = os.getcwd()+'/limitsJuly2019/'+templateDir.split('/')[-1]+'/'
-if not os.path.exists(outputDir): os.system('mkdir '+outputDir)
+outputDir = os.getcwd()+'/limitsMay20/'+templateDir.split('/')[-1]+'/'
+if not os.path.exists(outputDir): os.system('mkdir -p '+outputDir)
 outputDir+= '/'+limitType+'/'
-if not os.path.exists(outputDir): os.system('mkdir '+outputDir)
+if not os.path.exists(outputDir): os.system('mkdir -p '+outputDir)
 print outputDir
 
 def findfiles(path, filtre):
@@ -44,9 +47,9 @@ rootfilelist = []
 i=0
 for rootfile in findfiles(templateDir, '*.root'):
     #if 'splitLess' not in rootfile:continue
-    if 'rebinned_stat0p3.root' not in rootfile: continue
+    if 'rebinned' not in rootfile: continue
     if 'plots' in rootfile: continue
-    if '0p5' not in rootfile and '1p0' not in rootfile: continue
+    #if '0p5' not in rootfile and '1p0' not in rootfile: continue
     rootfilelist.append(rootfile)
     i+=1
 
@@ -90,12 +93,12 @@ for limitConf in limitConfs:
         if '_'+limitConf+'_' not in file: continue
         fileName = file.split('/')[-1]
         signal = fileName.split('_')[2]
-        BRStr = fileName[fileName.find(signal)+len(signal):fileName.find('_59p69fb')]
+        #BRStr = fileName[fileName.find(signal)+len(signal):fileName.find('_59p69fb')]
 
         ## Make the output directory, go there, and make the config
         ## Will pick up executable from main dir
-        outDir = outputDir+limitConf+BRStr+'/'
-        print signal,BRStr
+        outDir = outputDir+limitConf+'/'
+        print signal
         if not os.path.exists(outDir+postfix): os.system('mkdir -p '+outDir+postfix)
         os.chdir(outDir+postfix)
         makeThetaConfig(file,outDir)

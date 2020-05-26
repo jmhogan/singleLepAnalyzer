@@ -23,14 +23,37 @@ def analyze(tTree,process,cutList,doAllSys,doJetRwt,iPlot,plotDetails,category,r
 	tag   = category['tag']
 	catStr = 'is'+isEM+'_'+tag#+'_'+algo
 
-        cut = 'NJets >= 4'
+	# Design the EM cuts for categories
+	isEMCut=''
+	if isEM=='E': 
+		if 'DataM' in process: isEMCut+='isElectron==0 && isMuon==0' # should be empty
+		else: isEMCut+='isElectron==1'
+	elif isEM=='M': 
+		if 'DataE' in process: isEMCut+='isElectron==0 && isMuon==0' # should be empty
+		else: isEMCut+='isMuon==1'
 	
-	if 'CR' in region: # 'CR' or 'CRinc'  goodHitFit and fails probchi2
-		cut += ' && tMass >= 0 && chi2 >= 13.81551'
+		
+	# Design the tagging cuts for categories
+	tagCut = ''	
+        if tag == '0W': tagCut = ' && usesWtag == 0'
+	elif tag == '1pW': tagCut = ' && usesWtag == 1'
+
+        cut = ''#NJets >= 3'
+	
+	if region == 'CR': # 'CR' or 'CRinc'  goodHitFit and fails probchi2
+		cut += '&& tMass > 0 && probchi2 > -1 && probchi2 < 0.001'
+	elif region == 'AltCR':
+		cut += '&& NJetsDeepCSVmed == 0 && NJetsDeepCSVloose != 0'
+	elif region == 'AltSR': 
+		cut += '&& NJetsDeepCSVmed > 1 && AK4HT > 500'
 	elif 'SR' in region: # 'SR'  goodHitFit and pass probchi2
-		cut += ' && tMass >= 0 && chi2 < 13.81551'
+		cut += '&& tMass > 0 && probchi2 > 0.001'
 	elif 'PS' in region: # 'PS'  
-		cut += ''
+		if region == 'PS0b': cut += '&& NJetsDeepCSVmed == 0'
+		elif region == 'PS2b': cut += '&& NJetsDeepCSVmed > 1'
+
+	fullcut = isEMCut+tagCut+cut
+		
 	# Define weights change to all 1's!!
 	TrigEffElUp = '1'
 	TrigEffElDn = '1'
@@ -50,7 +73,8 @@ def analyze(tTree,process,cutList,doAllSys,doJetRwt,iPlot,plotDetails,category,r
 	if 'Data' not in process: 
 		# replaced isoSF, MuTrkSF with 1
 		weightStr          += ' * '+jetSFstr+' * '+TrigEff+' * pileupWeight * '+str(weight[process])+'* (genWeight/abs(genWeight))'
-
+		if 'TTJets' in process:  weightStr += ' * topPtWeight'
+ 
 #		weightTrigEffElUpStr  = weightStr.replace(TrigEff,TrigEffElUp)
 #                weightTrigEffElDownStr= weightStr.replace(TrigEff,TrigEffElDn)
 #		weightTrigEffMuUpStr  = weightStr.replace(TrigEff,TrigEffMuUp)
@@ -66,8 +90,8 @@ def analyze(tTree,process,cutList,doAllSys,doJetRwt,iPlot,plotDetails,category,r
 		weightmuFUpStr      = 'LHEScaleWeight[3] * '+weightStr#'renormWeights[1] * '+weightStr
 		weightmuFDownStr    = 'LHEScaleWeight[5] * '+weightStr#'renormWeights[0] * '+weightStr
 
-#		weighttopptUpStr    = weightStr.replace('topPtWeight13TeV','1')
-#		weighttopptDownStr  = weightStr #.replace('topPtWeight13TeV','topPtWeight13TeV*topPtWeight13TeV')
+		weighttopptUpStr    = weightStr.replace('topPtWeight','1')
+		weighttopptDownStr  = weightStr #.replace('topPtWeight13TeV','topPtWeight13TeV*topPtWeight13TeV')
 #		weightjsfUpStr      = weightStr.replace(jetSFstr,jetSFstrUp)
 #		weightjsfDownStr    = weightStr.replace(jetSFstr,jetSFstrDn)
 
@@ -81,16 +105,6 @@ def analyze(tTree,process,cutList,doAllSys,doJetRwt,iPlot,plotDetails,category,r
 	print "/////"*5
 	print "PROCESSING: ", process
 	print "/////"*5
-
-	# Design the EM cuts for categories
-	isEMCut=''
-	if isEM=='E': isEMCut+=' && isElectron==1'
-	elif isEM=='M': isEMCut+=' && isMuon==1'
-		
-	# Design the tagging cuts for categories
-	tagCut = ''	
-
-	fullcut = cut+isEMCut+tagCut
 
 	print 'plotTreeName: '+plotTreeName
 	print 'Flavour: '+isEM+' #tag: '+tag
@@ -111,8 +125,8 @@ def analyze(tTree,process,cutList,doAllSys,doJetRwt,iPlot,plotDetails,category,r
 	#	hists[iPlot+'prefireDown_'   +lumiStr+'fb_'+catStr+'_'+process] = TH1D(iPlot+'prefireDown_'   +lumiStr+'fb_'+catStr+'_'+process,xAxisLabel,len(xbins)-1,xbins)
 		hists[iPlot+'muRFcorrdUp_'  +lumiStr+'fb_'+catStr+'_'+process] = TH1D(iPlot+'muRFcorrdUp_'  +lumiStr+'fb_'+catStr+'_'+process,xAxisLabel,len(xbins)-1,xbins)
 		hists[iPlot+'muRFcorrdDown_'+lumiStr+'fb_'+catStr+'_'+process] = TH1D(iPlot+'muRFcorrdDown_'+lumiStr+'fb_'+catStr+'_'+process,xAxisLabel,len(xbins)-1,xbins)
-		#hists[iPlot+'topptUp_'      +lumiStr+'fb_'+catStr+'_'+process] = TH1D(iPlot+'topptUp_'      +lumiStr+'fb_'+catStr+'_'+process,xAxisLabel,len(xbins)-1,xbins)
-		#hists[iPlot+'topptDown_'    +lumiStr+'fb_'+catStr+'_'+process] = TH1D(iPlot+'topptDown_'    +lumiStr+'fb_'+catStr+'_'+process,xAxisLabel,len(xbins)-1,xbins)
+		hists[iPlot+'topptUp_'      +lumiStr+'fb_'+catStr+'_'+process] = TH1D(iPlot+'topptUp_'      +lumiStr+'fb_'+catStr+'_'+process,xAxisLabel,len(xbins)-1,xbins)
+		hists[iPlot+'topptDown_'    +lumiStr+'fb_'+catStr+'_'+process] = TH1D(iPlot+'topptDown_'    +lumiStr+'fb_'+catStr+'_'+process,xAxisLabel,len(xbins)-1,xbins)
 	#	hists[iPlot+'jsfUp_'        +lumiStr+'fb_'+catStr+'_'+process] = TH1D(iPlot+'jsfUp_'        +lumiStr+'fb_'+catStr+'_'+process,xAxisLabel,len(xbins)-1,xbins)
 	#	hists[iPlot+'jsfDown_'      +lumiStr+'fb_'+catStr+'_'+process] = TH1D(iPlot+'jsfDown_'      +lumiStr+'fb_'+catStr+'_'+process,xAxisLabel,len(xbins)-1,xbins)
 			
@@ -151,8 +165,8 @@ def analyze(tTree,process,cutList,doAllSys,doJetRwt,iPlot,plotDetails,category,r
 #		tTree[process].Draw(plotTreeName+' >> '+iPlot+'prefireDown_'   +lumiStr+'fb_'+catStr+'_'+process, weightPrefireDownStr+'*('+fullcut+')', 'GOFF')
 		tTree[process].Draw(plotTreeName+' >> '+iPlot+'muRFcorrdUp_'  +lumiStr+'fb_'+catStr+'_'+process, weightmuRFcorrdUpStr  +'*('+fullcut+')', 'GOFF')
 		tTree[process].Draw(plotTreeName+' >> '+iPlot+'muRFcorrdDown_'+lumiStr+'fb_'+catStr+'_'+process, weightmuRFcorrdDownStr+'*('+fullcut+')', 'GOFF')
-		#tTree[process].Draw(plotTreeName+' >> '+iPlot+'topptUp_'      +lumiStr+'fb_'+catStr+'_'+process, weighttopptUpStr+'*('+fullcut+')', 'GOFF')
-		#tTree[process].Draw(plotTreeName+' >> '+iPlot+'topptDown_'    +lumiStr+'fb_'+catStr+'_'+process, weighttopptDownStr+'*('+fullcut+')', 'GOFF')
+		tTree[process].Draw(plotTreeName+' >> '+iPlot+'topptUp_'      +lumiStr+'fb_'+catStr+'_'+process, weighttopptUpStr+'*('+fullcut+')', 'GOFF')
+		tTree[process].Draw(plotTreeName+' >> '+iPlot+'topptDown_'    +lumiStr+'fb_'+catStr+'_'+process, weighttopptDownStr+'*('+fullcut+')', 'GOFF')
 #		tTree[process].Draw(plotTreeName+' >> '+iPlot+'jsfUp_'        +lumiStr+'fb_'+catStr+'_'+process, weightjsfUpStr+'*('+fullcut+')', 'GOFF')
 #		tTree[process].Draw(plotTreeName+' >> '+iPlot+'jsfDown_'      +lumiStr+'fb_'+catStr+'_'+process, weightjsfDownStr+'*('+fullcut+')', 'GOFF')
 

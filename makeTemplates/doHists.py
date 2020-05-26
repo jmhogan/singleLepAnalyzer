@@ -14,11 +14,11 @@ gROOT.SetBatch(1)
 start_time = time.time()
 
 lumiStr = str(targetlumi/1000).replace('.','p') # 1/fb
-step1Dir = 'root://cmseos.fnal.gov//store/user/jmanagan/NanoAODv6_1lep2018_040920_step1haddsHTSF'
+step1Dir = 'root://cmseos.fnal.gov//store/user/jmanagan/NanoAODv6_1lep2018_051620_step1hadds'
 
-iPlot = 'lepPt' #minMlb' #choose a discriminant from plotList below!
+iPlot = 'HT' #minMlb' #choose a discriminant from plotList below!
 if len(sys.argv)>2: iPlot=sys.argv[2]
-region = 'PS'
+region = 'PS2b'
 if len(sys.argv)>3: region=sys.argv[3]
 isCategorized = False
 if len(sys.argv)>4: isCategorized=int(sys.argv[4])
@@ -61,7 +61,7 @@ dataList = [
 	]
 
 whichSignal = 'TT' #HTB, TT, BB, or X53X53
-massList = range(1000,1800+1,100)
+massList = range(900,1800+1,100)
 sigList = [whichSignal+'M'+str(mass) for mass in massList]
 if whichSignal=='X53X53': sigList = [whichSignal+'M'+str(mass)+chiral for mass in massList for chiral in ['left','right']]
 if whichSignal=='TT': decays = ['']#'BWBW','THTH','TZTZ','TZBW','THBW','TZTH'] #T' decays
@@ -82,6 +82,9 @@ else:
 #bigbins = [0,50,100,150,200,250,300,350,400,450,500,600,700,800,1000,1200,1500]
 bigbins = [0,50,100,125,150,175,200,225,250,275,300,325,350,375,400,450,500,600,700,800,900,1000,1200,1400,1600,1800,2000,2500,3000,3500,4000,5000]
 
+tmassbins = [91.923, 98.358, 105.243, 112.610, 120.492, 128.927, 137.951, 147.608, 157.941, 168.997, 180.826, 193.484, 207.028, 221.521, 237.026, 253.618, 271.372, 290.368, 310.693, 332.442, 355.713, 380.613, 407.256, 435.763, 466.267, 498.906, 533.829, 571.197, 611.181, 653.964, 699.741, 748.723, 801.133, 857.213, 917.218, 981.423, 1050.123, 1123.631, 1202.285, 1286.445, 1376.496, 1472.851, 1575.951, 1686.267, 1804.306, 1930.606, 2065.750, 2210.353, 2365.077, 2530.633, 2707.777, 2897.321, 3100.134]
+
+
 nbins = 51
 xmax = 800
 if isCategorized and 'SR' in region: 
@@ -90,17 +93,18 @@ if isCategorized and 'SR' in region:
 
 plotList = {#discriminantName:(discriminantLJMETName, binning, xAxisLabel)
         'lepPt' :('Lepton_pt',linspace(0, 1000, 51).tolist(),';Lepton p_{T} [GeV];'),
-        'lepEta':('Lepton_eta',linspace(-4, 4, 41).tolist(),';Lepton #eta;'),
+        'lepEta':('Lepton_eta',linspace(-2.5, 2,5, 51).tolist(),';Lepton #eta;'),
 	'lepPhi':('Lepton_phi',linspace(-3.2,3.2,65).tolist(),';#phi(l)'),
 
-        'JetEta':('Jet_eta',linspace(-4, 4, 41).tolist(),';AK4 Jet #eta;'),
+        'JetEta':('Jet_eta',linspace(-2.4,2.4, 49).tolist(),';AK4 Jet #eta;'),
         'JetPt' :('Jet_pt',linspace(0, 1500, 51).tolist(),';jet p_{T} [GeV];'),
         'JetPhi':('Jet_phi',linspace(-3.2,3.2,65).tolist(),';AK4 Jet #phi'),
 
-        'tmass':('tMass',linspace(50,2450,51).tolist(),';M(t) [GeV]'),
-        'chi2':('chi2',linspace(0,1000,51).tolist(),';chi^{2}'),
-        'ProbChi2':('exp(-chi2/2)',linspace(0,1,51).tolist(),';Prob chi^{2}'),
-        'ProbChi2zoom':('exp(-chi2/2)',linspace(0,0.05,51).tolist(),';Prob chi^{2}'),
+        'tmassBins':('tMass',tmassbins,';M(t) [GeV]'),
+        'tmass':('tMass',linspace(100,3000,51).tolist(),';M(t) [GeV]'),
+        'chi2':('chi2',linspace(0,500,51).tolist(),';chi^{2}'),
+        'ProbChi2':('probchi2',linspace(0,0.5,51).tolist(),';Prob chi^{2}'),
+        'ProbChi2zoom':('probchi2',linspace(0,0.05,51).tolist(),';Prob chi^{2}'),
 
         'MET':('MET_pt',linspace(0, 1500, 51).tolist(),';#slash{E}_{T} [GeV];'),
         'METphi':('MET_phi',linspace(-3.2, 3.2, 65).tolist(),';#phi(#slash{E}_{T});'),
@@ -112,15 +116,33 @@ plotList = {#discriminantName:(discriminantLJMETName, binning, xAxisLabel)
         'NJetsAK8':('NFatJets',linspace(0, 10, 11).tolist(),';AK8 jet multiplicity;'),
 
         'JetPtAK8':('FatJet_pt',linspace(0, 1500, 51).tolist(),';AK8 jet p_{T} [GeV];'),
-        'JetEtaAK8':('FatJet_eta',linspace(-4,4, 41).tolist(),';AK8 jet #eta;'),
+        'JetEtaAK8':('FatJet_eta',linspace(-2.4,2.4, 49).tolist(),';AK8 jet #eta;'),
         'JetPhiAK8':('FatJet_phi',linspace(-3.2,3.2,65).tolist(),';AK8 Jet #phi'),
+	'JetSDMassAK8':('FatJet_sdmass',linspace(0,300,51).tolist(),';AK8 jet softdrop mass [GeV]'),
+	'JetSDMassCorrAK8':('FatJet_sdmasscorr',linspace(0,300,51).tolist(),';AK8 jet corrected softdrop mass [GeV]'),
+	'JetTau21AK8':('FatJet_tau21',linspace(0,1,51).tolist(),';AK8 jet #tau_{2}/#tau_{1} [GeV]'),
 
         'HybridJet1Pt':('HybridJet_pt[0]',linspace(0, 1500, 51).tolist(),';1st jet p_{T} [GeV];'),
         'HybridJet2Pt':('HybridJet_pt[1]',linspace(0, 1500, 51).tolist(),';2nd jet p_{T} [GeV];'),
         'HybridJet3Pt':('HybridJet_pt[2]',linspace(0, 1500, 51).tolist(),';3rd jet p_{T} [GeV];'),
         'HybridJet4Pt':('HybridJet_pt[3]',linspace(0, 1500, 51).tolist(),';4th jet p_{T} [GeV];'),
 
+	'fittedLepPt' :('fittedLepPt',linspace(0, 1000, 51).tolist(),';Fitted Lepton p_{T} [GeV];'),
+        'fittedLepEta':('fittedLepEta',linspace(-2.5, 2,5, 51).tolist(),';Fitted Lepton #eta;'),
+        'fittedLepPhi':('fittedLepPhi',linspace(-3.2,3.2,65).tolist(),';Fitted #phi(l)'),
+	'fittedLepMass' :('fittedLepMass',linspace(0, 0.12, 51).tolist(),';Fitted Lepton Mass [GeV];'),
 
+        'fittedMETPt':('fittedMETPt',linspace(0, 1000, 51).tolist(),';Fitted #slash{E}_{T} [GeV];'),
+        'fittedLepEta':('fittedMETEta',linspace(-5, 5, 51).tolist(),';Fitted MET #eta;'),
+        'fittedMETPhi':('fittedMETPhi',linspace(-3.2, 3.2, 65).tolist(),';Fitted #phi(#slash{E}_{T});'),
+	'fittedMETMass':('fittedMETMass',linspace(0, 0.001, 51).tolist(),';Fitted MET Mass [GeV];'),
+
+        'fittedJetEta':('fittedJetEta',linspace(-2.4, 2.4, 49).tolist(),';Fitted Jet #eta;'),
+        'fittedJetPt' :('fittedJetPt',linspace(0, 1500, 51).tolist(),';Fitted jet p_{T} [GeV];'),
+        'fittedJetPhi':('fittedJetPhi',linspace(-3.2,3.2,65).tolist(),';Fitted AK4 Jet #phi'),
+	'fittedJetMass':('fittedJetMass',linspace(0,1000,51).tolist(),';M(Jet) [GeV]'),
+
+	
 
 }
 print "PLOTTING:",iPlot
@@ -155,7 +177,7 @@ for cat in catList:
  	category = {'isEM':cat[0],'tag':cat[1]}
 
 	print 'Running analyze'
- 	for data in dataList: 
+ 	for data in dataList: 		
 		print '-------------------------'
 		tTreeData[data]=readTreeNominal(samples[data],step1Dir) ## located in utils.py
  		datahists.update(analyze(tTreeData,data,cutList,False,doJetRwt,iPlot,plotList[iPlot],category,region,isCategorized,whichSignal))

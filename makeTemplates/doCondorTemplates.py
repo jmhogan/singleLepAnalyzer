@@ -13,14 +13,15 @@ date='%i_%i_%i'%(cTime.year,cTime.month,cTime.day)
 time='%i_%i_%i'%(cTime.hour,cTime.minute,cTime.second)
 pfix = 'templates'+region
 if not categorize: pfix='kinematics'+region
-pfix+='_Take3'
+pfix+='_051720'
 
-iPlotList = [#distribution name as defined in "doHists.py"
+PlotList = [#distribution name as defined in "doHists.py"
 
+	'tmassBins',
 	'tmass',
 	'chi2',
 	'ProbChi2',
-	'ProbChi2zoom',
+	'ProbChi2zoom', 
 
 	'JetPt', 
 	'JetEta',
@@ -38,6 +39,9 @@ iPlotList = [#distribution name as defined in "doHists.py"
 	'JetPtAK8',
 	'JetEtaAK8',
 	'JetPhiAK8',
+	'JetSDMassAK8',
+	'JetSDMassCorrAK8',
+	'JetTau21AK8',
 
 	'lepPt', 
 	'lepEta',
@@ -48,12 +52,24 @@ iPlotList = [#distribution name as defined in "doHists.py"
 	'HybridJet3Pt',
 	'HybridJet4Pt',
 
+        'fittedLepPt', 
+	'fittedLepEta', 
+	'fittedLepPhi',	
+	'fittedLepMass', 
+	'fittedMETPt', 
+	'fittedMETPhi', 
+	'fittedMETEta', 
+	'fittedMETMass',
+        'fittedJetEta',
+	'fittedJetPt',
+	'fittedJetPhi', 
+	'fittedJetMass', 
 	]
 
 isEMlist = ['E','M']
 
 taglist = ['all']
-if categorize: taglist=['0W','1pW'] ## analyze.py doesn't understand this yet
+if categorize: taglist=['0W','1pW'] 
 
 outDir = outputDir+pfix+'/'
 if not os.path.exists(outDir): os.system('mkdir '+outDir)
@@ -63,7 +79,7 @@ os.chdir(outDir)
 catlist = list(itertools.product(isEMlist,taglist))
 
 count=0
-for iplot in iPlotList:
+for iplot in PlotList:
 	for cat in list(itertools.product(isEMlist,taglist)):
 		catDir = cat[0]+'_'+cat[1]	
 		outDir = outputDir+pfix+'/'+catDir

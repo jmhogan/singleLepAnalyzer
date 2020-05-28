@@ -312,7 +312,6 @@ nRun['BBM1600BHBH'] = BB1600*0.333*0.333
 nRun['BBM1700BHBH'] = BB1700*0.333*0.333
 nRun['BBM1800BHBH'] = BB1800*0.333*0.333
 
-
 # Cross sections for MC samples (in pb) -- most unchanged for 2017
 xsec={}
 xsec['DY'] = 6025.2 # https://twiki.cern.ch/twiki/bin/view/CMS/SummaryTable1G25ns

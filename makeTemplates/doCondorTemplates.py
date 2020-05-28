@@ -5,6 +5,7 @@ if thisDir[-13:] == 'makeTemplates': runDir = thisDir[:-13]
 else: runDir = thisDir
 if os.getcwd()[-17:] == 'singleLepAnalyzer': os.chdir(os.getcwd()+'/makeTemplates/')
 outputDir = thisDir+'/'
+
 region='PS' #PS,SR,TTCR,WJCR
 
 categorize=0 #1==categorize into t/W/b/j, 0==only split into flavor

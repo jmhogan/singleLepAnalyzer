@@ -58,6 +58,8 @@ if whichSignal=='BB': decays = ['TWTW','BHBH','BZBZ','BZTW','BHTW','BZBH'] #B' d
 
 doBRScan = False
 if isCategorized and 'SR' in region: doBRScan = True
+elif isCategorized and 'CR' in region: doBRScan = True
+
 BRs={}
 if whichSignal=='TT':
 	BRs['BW']=[0.0,0.50,1.0,0.0,0.0]#,0.0,0.0,0.0,0.0,0.0,0.2,0.2,0.2,0.2,0.2,0.4,0.4,0.4,0.4,0.6,0.6,0.6,0.8,0.8,1.0]
@@ -69,6 +71,7 @@ elif whichSignal=='BB':
         BRs['BH']=[0.5,0.25,0.0,1.0,0.0]#,0.2,0.4,0.6,0.8,1.0,0.0,0.2,0.4,0.6,0.8,0.0,0.2,0.4,0.6,0.0,0.2,0.4,0.0,0.2,0.0]  # May or may not want to keep these lines, have to ask
         BRs['BZ']=[0.5,0.25,0.0,0.0,1.0]#,0.8,0.6,0.4,0.2,0.0,0.8,0.6,0.4,0.2,0.0,0.6,0.4,0.2,0.0,0.4,0.2,0.0,0.2,0.0,0.0]
 	nBRconf=len(BRs['TW'])
+
 if not doBRScan: nBRconf=1
 
 isEMlist =['E','M']
@@ -89,6 +92,7 @@ if isCategorized:
 	#	 'notV2W0Z0H0T','notV2pW0Z0H1pT','notV2pW0Z1pH0pT','notV2pW1pZ0pH0pT',
 	#	 'notV1W0Z0H0T','notV1W0Z1H0T','notV1W0Z0H1pT','notV1W0Z1H1pT','notV1W0Z2pH0pT','notV1W1Z0H0pT','notV1W1Z1pH0pT','notV1W2pZ0pH0pT',
 	#	 'notV0W0Z0H0T','notV0W0Z1H0T','notV0W0Z0H1pT','notV0W0Z1H1pT','notV0W0Z2pH0pT','notV0W1Z0H0pT','notV0W1Z1pH0pT','notV0W2pZ0pH0pT']
+
 
 catList = ['is'+item[0]+'_'+item[1]+'_'+item[2] for item in list(itertools.product(isEMlist,taglist,algolist))]
 print 'catList', catList
@@ -127,6 +131,7 @@ def makeThetaCats(datahists,sighists,bkghists,discriminant):
 		BRconfStr=''
 		if doBRScan and whichSignal=='TT': BRconfStr='_bW'+str(BRs['BW'][BRind]).replace('.','p')+'_tZ'+str(BRs['TZ'][BRind]).replace('.','p')+'_tH'+str(BRs['TH'][BRind]).replace('.','p')
 		elif doBRScan and whichSignal=='BB': BRconfStr='_tW'+str(BRs['TW'][BRind]).replace('.','p')+'_bZ'+str(BRs['BZ'][BRind]).replace('.','p')+'_bH'+str(BRs['BH'][BRind]).replace('.','p')
+
 		print "       BR Configuration:"+BRconfStr
 		#Initialize dictionaries for histograms
 		hists={}
@@ -463,6 +468,7 @@ for iPlot in iPlotList:
 	bkghists  = {}
 	sighists  = {}
 	#if iPlot!='HT': continue
+
 	print "LOADING DISTRIBUTION: "+iPlot
 	for cat in catList:
 		print "         ",cat[2:]
@@ -478,6 +484,7 @@ for iPlot in iPlotList:
 	for key in sighists:
 		if 'MET_' in key and 'TTM800' in key: print key
 	print "       MAKING CATEGORIES FOR TOTAL SIGNALS ..."
+
 	if whichSignal=='BB': iPlot=iPlot.replace('Tp','Bp')
 	try:
 		makeThetaCats(datahists,sighists,bkghists,iPlot)
@@ -486,5 +493,6 @@ for iPlot in iPlotList:
 		print(e)
 		print 'makeThetaCats failed for iPlot:',iPlot
 		pass
+
 
 print("--- %s minutes ---" % (round((time.time() - start_time)/60,2)))

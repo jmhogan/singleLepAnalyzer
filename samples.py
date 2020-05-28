@@ -218,7 +218,6 @@ samples = {
 #'TTWH':'TTWH_TuneCP5_13TeV-madgraph-pythia8',
 #'TTWq':'TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8',
 
-
 }
 
 

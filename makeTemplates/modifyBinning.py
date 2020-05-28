@@ -29,6 +29,7 @@ start_time = time.time()
 # -- Use "removalKeys" to remove specific systematics from the output file.
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+
 iPlot='DnnTprime'
 if len(sys.argv)>1: iPlot=str(sys.argv[1])
 folder = 'templatesSR_May2020TT_May9'
@@ -38,6 +39,7 @@ templateDir = os.getcwd()+'/'+folder+'/'+cutString
 print "templateDir: ",templateDir
 combinefile = 'yields_'+iPlot+'_35p867fb.root'
 
+
 rebin4chi2 = False #include data in requirements
 rebinCombine = False #else rebins theta templates
 
@@ -46,6 +48,7 @@ normalizePDF    = False #only for signals
 #X53X53, TT, BB, HTB, etc --> this is used to identify signal histograms for combine templates when normalizing the pdf and muRF shapes to nominal!!!!
 sigName = 'TT' #MAKE SURE THIS WORKS FOR YOUR ANALYSIS PROPERLY!!!!!!!!!!!
 massList = range(1000,1800+1,100)
+
 sigProcList = [sigName+'M'+str(mass) for mass in massList]
 if sigName=='TT': 
 	sigProcList = [sigName+'M'+str(mass) for mass in massList]
@@ -470,7 +473,6 @@ for isEM in isEMlist:
 					else: yielderrtemp += (modelingSys[proc+'_'+modTag]*yieldtemp)**2
 					yielderrtemp += (corrdSys*yieldtemp)**2
 				yielderrtemp = math.sqrt(yielderrtemp)
-				#print "yieldsAll: ",yieldsAll
 				if proc==dataName: row.append(' & '+str(int(yieldsAll[histoPrefix+proc])))
 				else: row.append(' & '+str(round_sig(yieldtemp,5))+' $\pm$ '+str(round_sig(yielderrtemp,2)))
 			row.append('\\\\')

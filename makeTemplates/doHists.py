@@ -1,14 +1,17 @@
 #!/usr/bin/python
 
+
 import os,sys,time,math,datetime,pickle,itertools,getopt
 from ROOT import TH1D,gROOT,TFile,TTree
 parent = os.path.dirname(os.getcwd())
 sys.path.append(parent)
 from numpy import linspace
+
 from weights import *
 from analyze import *
 from samples import *
 from utils import *
+
 
 gROOT.SetBatch(1)
 start_time = time.time()
@@ -57,8 +60,9 @@ dataList = [
 	'DataMBCDEFG',
 	]
 
-whichSignal = 'TT' #HTB, TT, BB, or X53X53
-massList = range(1000,1800+1,100)
+whichSignal = 'BB' #HTB, TT, BB, or X53X53
+#massList = range(1000,1800+1,100)
+massList = [1000,1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800]
 sigList = [whichSignal+'M'+str(mass) for mass in massList]
 if whichSignal=='X53X53': sigList = [whichSignal+'M'+str(mass)+chiral for mass in massList for chiral in ['left','right']]
 if whichSignal=='TT': decays = ['BWBW','THTH','TZTZ','TZBW','THBW','TZTH'] #T' decays
@@ -96,7 +100,7 @@ plotList = {#discriminantName:(discriminantLJMETName, binning, xAxisLabel)
         'Wpt':('W_pt',linspace(0,1000,51).tolist(),';Wpt [GeV]'),
         'Wdrlep':('W_dRLep',linspace(0,5,51).tolist(),';leptonic W, #DeltaR(W,lepton)'),
         'tdrWb':('t_dRWb',linspace(0,5,51).tolist(),';leptonic t, #DeltaR(W,b)'),
-	'isLepW':('isLeptonic_W',linspace(0,2,3).tolist(),';lepton from W'),
+	      'isLepW':('isLeptonic_W',linspace(0,2,3).tolist(),';lepton from W'),
         'Tp1Mass':('Tprime1_DeepAK8_Mass',linspace(0,4000,51).tolist(),';M(lepT) [GeV]'), ## replace with ALGO if needed
         'Tp2Mass':('Tprime2_DeepAK8_Mass',linspace(0,4000,nbins).tolist(),';M(hadT) [GeV]'),
         'Tp2MDnn':('Tprime2_DeepAK8_Mass',linspace(0,4000,nbins).tolist(),';M(hadT) [GeV]'), #analyze.py makes notV DnnTprime
@@ -109,7 +113,7 @@ plotList = {#discriminantName:(discriminantLJMETName, binning, xAxisLabel)
         'Tp2Phi':('Tprime2_DeepAK8_Phi',linspace(-3.14,3.14,51).tolist(),';hadT quark #phi'),
         'Tp1deltaR':('Tprime1_DeepAK8_deltaR',linspace(0,5,51).tolist(),';#DeltaR(lepT quark product jets)'),
         'Tp2deltaR':('Tprime2_DeepAK8_deltaR',linspace(0,5,51).tolist(),';#DeltaR(hadT quark product jets)'),
-	'Bp1Mass':('Bprime1_DeepAK8_Mass',linspace(0,4000,51).tolist(),';M(B) [GeV]'), ## replace with ALGO if needed
+	      'Bp1Mass':('Bprime1_DeepAK8_Mass',linspace(0,4000,51).tolist(),';M(B) [GeV]'), ## replace with ALGO if needed
         'Bp2Mass':('Bprime2_DeepAK8_Mass',linspace(0,4000,nbins).tolist(),';M(B) [GeV]'),
         'Bp2MDnn':('Bprime2_DeepAK8_Mass',linspace(0,4000,nbins).tolist(),';M(B) [GeV]'), #analyze.py makes notV DnnBprime
         'Bp2MST':('Bprime2_DeepAK8_Mass',linspace(0,4000,nbins).tolist(),';M(B) [GeV]'), #analyze.py makes notV ST
@@ -121,6 +125,7 @@ plotList = {#discriminantName:(discriminantLJMETName, binning, xAxisLabel)
         'Bp2Phi':('Bprime2_DeepAK8_Phi',linspace(-3.14,3.14,51).tolist(),';B quark #phi'),
         'Bp1deltaR':('Bprime1_DeepAK8_deltaR',linspace(0,5,51).tolist(),';#DeltaR(B quark product jets)'),
         'Bp2deltaR':('Bprime2_DeepAK8_deltaR',linspace(0,5,51).tolist(),';#DeltaR(B quark product jets)'),
+
 	'DnnTprime':('dnn_Tprime',linspace(0,1,nbins).tolist(),';DNN T score'),
 	'DnnTTbar':('dnn_ttbar',linspace(0,1,51).tolist(),';DNN-T t#bar{t} score'),
 	'DnnWJets':('dnn_WJets',linspace(0,1,51).tolist(),';DNN-T W+jets score'),

@@ -1,9 +1,11 @@
+
 ---------------------BprimeBprime_M-1000_TuneCP5_PSweights_13TeV-madgraph-pythia8--------------------------
 837902.343. # from integral 844000.0
 MuRF up yield = 1128984.96
 MuRF dn yield = 637060.031
 PDF up yield = 840486.309
 PDF dn yield = 833902.344
+
 MUup scale factor = 0.742
 MUdn scale factor = 1.315
 PDFup scale factor = 0.997
@@ -178,3 +180,4 @@ MUup scale factor = 0.74
 MUdn scale factor = 1.321
 PDFup scale factor = 0.969
 PDFdn scale factor = 1.051
+

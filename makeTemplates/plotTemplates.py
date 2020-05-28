@@ -11,7 +11,7 @@ from utils import *
 gROOT.SetBatch(1)
 start_time = time.time()
 
-lumi=59.7 #for plots #56.1 #
+lumi=35.9#2016 update #for plots #56.1 #
 lumiInTemplates= str(targetlumi/1000).replace('.','p') # 1/fb
 
 iPlot='dnnLargest'
@@ -22,7 +22,7 @@ isCategorized=False
 if len(sys.argv)>3: isCategorized=bool(eval(sys.argv[3]))
 pfix='templates'+region
 if not isCategorized: pfix='kinematics'+region
-pfix+='_Apr5'
+pfix+='_May2020TT_May9'
 if len(sys.argv)>4: pfix=str(sys.argv[4])
 templateDir=os.getcwd()+'/'+pfix+'/'
 
@@ -31,13 +31,21 @@ print 'Plotting',region,'is categorized?',isCategorized
 isRebinned=''#_rebinned_stat0p3' #post for ROOT file names
 if len(sys.argv)>7: isRebinned='_rebinned_stat'+str(sys.argv[7])
 BRstr=''
-if isCategorized: BRstr='bW0p5_tZ0p25_tH0p25_'
+if isCategorized and 'BB' in pfix: BRstr='tW0p5_bZ0p25_bH0p25_'
+elif isCategorized: BRstr='bW0p5_tZ0p25_tH0p25_'
+
 saveKey = '' # tag for plot names
 
-sig1='TTM1200' #  choose the 1st signal to plot
-sig1leg='T#bar{T} (1.2 TeV)'
-sig2='TTM1500' #  choose the 2nd signal to plot
-sig2leg='T#bar{T} (1.5 TeV)'
+if 'BB' in pfix:
+	sig1='BBM1200' #  choose the 1st signal to plot
+	sig1leg='B#bar{B} (1.2 TeV)'
+	sig2='BBM1500' #  choose the 2nd signal to plot
+	sig2leg='B#bar{B} (1.5 TeV)'
+else:
+	sig1='TTM1200' #  choose the 1st signal to plot
+        sig1leg='T#bar{T} (1.2 TeV)'
+        sig2='TTM1500' #  choose the 2nd signal to plot
+        sig2leg='T#bar{T} (1.5 TeV)'
 drawNormalized = False # STACKS CAN'T DO THIS...bummer
 scaleSignals = True
 if not isCategorized and 'CR' not in region: scaleSignals = True
@@ -53,8 +61,10 @@ if '53' in sig1: bkgHistColors = {'top':kRed-9,'ewk':kBlue-7,'qcd':kOrange-5} #X
 elif 'HTB' in sig1: bkgHistColors = {'ttbar':kGreen-3,'wjets':kPink-4,'top':kAzure+8,'ewk':kMagenta-2,'qcd':kOrange+5} #HTB
 else: bkgHistColors = {'top':kAzure+8,'ewk':kMagenta-2,'qcd':kOrange+5} #TT
 
-if len(isRebinned)>0: systematicList = ['pileup','jec','muRFcorrdNewTop','muRFcorrdNewEwk','muRFcorrdNewQCD','btag','jsf','Teff','Tmis','Heff','Hmis','Zeff','Zmis','Weff','Wmis','Beff','Bmis','Jeff','Jmis','jer','ltag']
-else: systematicList = ['muRFcorrd','pileup','jsf','jec','btag','Teff','Tmis','Heff','Hmis','Zeff','Zmis','Weff','Wmis','Beff','Bmis','Jeff','Jmis','jer','ltag']
+if len(isRebinned)>0: systematicList = ['muRFcorrd','pileup','jec','btag','jsf','muR','muF','Teff','Tmis','Heff','Hmis','Zeff','Zmis','Weff','Wmis','Beff','Bmis','Jeff','Jmis','jer','ltag']# 'pdf','prefire','toppt',]
+#['pileup','jec','muRFcorrdNewTop','muRFcorrdNewEwk','muRFcorrdNewQCD','toppt','btag','jsf','Teff','Tmis','Heff','Hmis','Zeff','Zmis','Weff','Wmis','Beff','Bmis','Jeff','Jmis','jer','ltag']
+else: systematicList = ['trigeffEl','trigeffMu','muRFcorrd','pileup','jec','btag','jsf','Teff','Tmis','Heff','Hmis','Zeff','Zmis','Weff','Wmis','Beff','Bmis','Jeff','Jmis','jer','ltag']# 'toppt','prefire' 
+#['muRFcorrd','pileup','jsf','jec','btag','Teff','Tmis','Heff','Hmis','Zeff','Zmis','Weff','Wmis','Beff','Bmis','Jeff','Jmis','jer','ltag']
 
 doAllSys = True
 print 'doAllSys: ',doAllSys,'systematicList: ',systematicList
@@ -84,7 +94,9 @@ if 'algos' in region or 'SR' in region or isCategorized:
 taglist = ['all']
 if isCategorized == True: 
 	taglist=['taggedbWbW','taggedtHbW','taggedtZbW','taggedtZHtZH','notV','notVtH','notVtZ','notVbW']
-	if '_' in pfix: taglist=['taggedbWbW','taggedtHbW','taggedtZbW','taggedtZHtZH','notVtH','notVtZ','notVbW',
+	if 'BB' in pfix: taglist=['taggedtWtW','taggedbZtW','taggedbHtW','notVbH','notVbZ','notVtW',
+					'notV2pT','notV01T2pH','notV01T1H','notV1T0H','notV0T0H1pZ','notV0T0H0Z2pW','notV0T0H0Z01W']
+	else: taglist=['taggedbWbW','taggedtHbW','taggedtZbW','taggedtZHtZH','notVtH','notVtZ','notVbW',
 					'notV2pT','notV01T2pH','notV01T1H','notV1T0H','notV0T0H1pZ','notV0T0H0Z2pW','notV0T0H0Z01W']
 	#isEMlist = ['L']
 	#taglist=['taggedbWbW','taggedtHbW','taggedtZbW','taggedtZHtZH','notVtZ','notVbW','notVtH',
@@ -258,7 +270,7 @@ for tag in tagList:
 			errorDn = 0.
 			errorStatUp = gaeBkgHT.GetErrorYhigh(ibin-1)**2
 			errorStatDn = gaeBkgHT.GetErrorYlow(ibin-1)**2
-			errorNorm = 0.
+			errorNorm = (corrdSys**2)*(bkgHT.GetBinContent(ibin)**2)
 
 			if doAllSys:
 				for syst in systematicList:
@@ -707,7 +719,7 @@ for tag in tagList:
 		errorDn = 0.
 		errorStatUp = gaeBkgHTmerged.GetErrorYhigh(ibin-1)**2
 		errorStatDn = gaeBkgHTmerged.GetErrorYlow(ibin-1)**2
-		errorNorm = 0.
+		errorNorm = (corrdSys**2)*(bkgHTmerged.GetBinContent(ibin)**2)
 
 		if doAllSys:
 			for syst in systematicList:

@@ -2,36 +2,36 @@ import os,sys
 execfile("/uscms_data/d3/jmanagan/EOSSafeUtils.py")
 
 dirlist = [ 
-'BprimeBprime_M-1000_TuneCP5_PSweights_13TeV-madgraph-pythia8',
-'BprimeBprime_M-1100_TuneCP5_PSweights_13TeV-madgraph-pythia8',
-'BprimeBprime_M-1200_TuneCP5_PSweights_13TeV-madgraph-pythia8',
-'BprimeBprime_M-1300_TuneCP5_PSweights_13TeV-madgraph-pythia8',
-'BprimeBprime_M-1400_TuneCP5_PSweights_13TeV-madgraph-pythia8',
-'BprimeBprime_M-1500_TuneCP5_PSweights_13TeV-madgraph-pythia8',
-'BprimeBprime_M-1600_TuneCP5_PSweights_13TeV-madgraph-pythia8',
-'BprimeBprime_M-1700_TuneCP5_PSweights_13TeV-madgraph-pythia8',
-'BprimeBprime_M-1800_TuneCP5_PSweights_13TeV-madgraph-pythia8',
-'TprimeTprime_M-1000_TuneCP5_PSweights_13TeV-madgraph-pythia8',
-'TprimeTprime_M-1100_TuneCP5_PSweights_13TeV-madgraph-pythia8',
-'TprimeTprime_M-1200_TuneCP5_PSweights_13TeV-madgraph-pythia8',
-'TprimeTprime_M-1300_TuneCP5_PSweights_13TeV-madgraph-pythia8',
-'TprimeTprime_M-1400_TuneCP5_PSweights_13TeV-madgraph-pythia8',
-'TprimeTprime_M-1500_TuneCP5_PSweights_13TeV-madgraph-pythia8',
-'TprimeTprime_M-1600_TuneCP5_PSweights_13TeV-madgraph-pythia8',
-'TprimeTprime_M-1700_TuneCP5_PSweights_13TeV-madgraph-pythia8',
-'TprimeTprime_M-1800_TuneCP5_PSweights_13TeV-madgraph-pythia8',
+'BprimeBprime_M-1000_TuneCP5_13TeV-madgraph-pythia8',
+'BprimeBprime_M-1100_TuneCP5_13TeV-madgraph-pythia8',
+'BprimeBprime_M-1200_TuneCP5_13TeV-madgraph-pythia8',
+'BprimeBprime_M-1300_TuneCP5_13TeV-madgraph-pythia8',
+'BprimeBprime_M-1400_TuneCP5_13TeV-madgraph-pythia8',
+'BprimeBprime_M-1500_TuneCP5_13TeV-madgraph-pythia8',
+'BprimeBprime_M-1600_TuneCP5_13TeV-madgraph-pythia8',
+'BprimeBprime_M-1700_TuneCP5_13TeV-madgraph-pythia8',
+'BprimeBprime_M-1800_TuneCP5_13TeV-madgraph-pythia8',
+'TprimeTprime_M-1000_TuneCP5_13TeV-madgraph-pythia8',
+'TprimeTprime_M-1100_TuneCP5_13TeV-madgraph-pythia8',
+'TprimeTprime_M-1200_TuneCP5_13TeV-madgraph-pythia8',
+'TprimeTprime_M-1300_TuneCP5_13TeV-madgraph-pythia8',
+'TprimeTprime_M-1400_TuneCP5_13TeV-madgraph-pythia8',
+'TprimeTprime_M-1500_TuneCP5_13TeV-madgraph-pythia8',
+'TprimeTprime_M-1600_TuneCP5_13TeV-madgraph-pythia8',
+'TprimeTprime_M-1700_TuneCP5_13TeV-madgraph-pythia8',
+'TprimeTprime_M-1800_TuneCP5_13TeV-madgraph-pythia8',
 ]
 
 from ROOT import TFile, TH1
 
 for sample in dirlist:
     print('---------------------'+sample+'--------------------------')
-    runlist = EOSlistdir('/store/user/jmanagan/FWLJMET102X_1lep2018mupdf_072919/'+sample+'/singleLep2018/')
+    runlist = EOSlistdir('/store/user/jmanagan/FWLJMET102X_1lep2018mupdf_072919/'+sample+'/singleLep2017/')
     if len(runlist) > 1: 
         print('PROBLEM: more than 1 crab directory, SKIPPING')
         continue
 
-    rfile = TFile.Open('root://cmseos.fnal.gov//store/user/jmanagan/FWLJMET102X_1lep2018mupdf_072919/'+sample+'/singleLep2018/'+str(runlist[0])+'/0000/'+sample+'_1.root')
+    rfile = TFile.Open('root://cmseos.fnal.gov//store/user/jmanagan/FWLJMET102X_1lep2018mupdf_072919/'+sample+'/singleLep2017/'+str(runlist[0])+'/0000/'+sample+'_1.root')
     hist = rfile.Get("mcweightanalyzer/weightHist")
     integral = hist.GetBinContent(5) + hist.GetBinContent(7)
     newpdf = hist.GetBinContent(2)

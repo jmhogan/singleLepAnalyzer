@@ -18,7 +18,7 @@ def get_model():
 
     for obs in obsvs:
         if 'isE' in obs:
-            try: model.add_lognormal_uncertainty('elIdSys', math.log(1.02), '*', obs) #Arguments: uncertainty name, magnitude of uncertainty, which processes it applies to, which channel or observable
+            try: model.add_lognormal_uncertainty('elIdSys', math.log(1.02), '*', obs) #(uncert name, magnitude, which process to apply to, which channel/observable)
             except: pass
             try: model.add_lognormal_uncertainty('elIsoSys', math.log(1.01), '*', obs) #iso + reco
             except: pass
@@ -35,8 +35,7 @@ def get_model():
             except: pass
             try: model.add_lognormal_uncertainty('muRecoSys', math.log(1.01), '*', obs) #iso + tracking
             except: pass
-        
-                         
+
     try: model.add_lognormal_uncertainty('lumiSys', math.log(1.023), '*', '*')
     except: pass
 

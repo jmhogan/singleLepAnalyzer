@@ -8,8 +8,9 @@ import os,sys,fnmatch
 # from unc_pu import *
 # from unc_scale import *
 
-runDir='/uscms_data/d3/cholz/CMSSW_10_2_10/src/singleLepAnalyzer'
-templateDir=runDir+'/makeTemplates/templatesSR_July2019_With_Uncertainties'
+runDir='/uscms_data/d3/escharni/CMSSW_10_2_10/src/singleLepAnalyzer'
+templateDir=runDir+'/makeTemplates/templatesSR_July_MVA_Update_Round2'
+
 thetaConfigTemp = os.getcwd()+'/theta_combineRun2_template.py'
 whichSignal = 'TT'
 
@@ -29,8 +30,8 @@ toFilterTrilep = []
 print toFilter
 
 limitType = 'comb1718'
-if not os.path.exists(runDir+'/thetaLimits/limitsJuly2019/'+templateDir.split('/')[-1])+'/'+limitType: os.system('mkdir -p '+runDir+'/thetaLimits/limitsJuly2019/'+templateDir.split('/')[-1]+'/'+limitType)
-outputDir = runDir+'/thetaLimits/limitsJuly2019/'+templateDir.split('/')[-1]+'/'+limitType
+if not os.path.exists(runDir+'/thetaLimits/limitsJul19/'+templateDir.split('/')[-1])+'/'+limitType: os.system('mkdir -p '+runDir+'/thetaLimits/limitsJul19/'+templateDir.split('/')[-1]+'/'+limitType)
+outputDir = runDir+'/thetaLimits/limitsJul19/'+templateDir.split('/')[-1]+'/'+limitType
 
 def findfiles(path, filtre):
     for root, dirs, files in os.walk(path):
@@ -58,7 +59,7 @@ thetaConfigLines = f.readlines()
 f.close()
 
 def makeThetaConfig(rFile16,rFile17,rFile18,rFile2L16,rFile2L17,rFile2L18,rFile3L16,rFile3L17,rFile3L18,outDir,BRStr):
-    with open(outDir+'/'+rFile18.split('/')[-1][:-5]+'.py','w') as fout:
+    with open(outDir+'/'+rFile17.split('/')[-1][:-5]+'.py','w') as fout:
         for line in thetaConfigLines:
                     ### save for later when combining with other final states
             # if 'TTZPUDOWN' in line: line = line.replace('TTZPUDOWN',str(2.0-puDn['TTZ']))
@@ -211,12 +212,12 @@ for file in rootfilelist:
     fileName = file.split('/')[-1]
     iPlot = fileName.split('_')[1]
     signal = fileName.split('_')[2]
-    BRStr = fileName[fileName.find(signal)+len(signal):fileName.find('_59p69fb')]        
+    BRStr = fileName[fileName.find(signal)+len(signal):fileName.find('_41p53fb')]        
 
-    file1L2017 = ((file.replace('templatesSR_July2019_With_Uncertainties','templatesSR_July_MVA_Update_Round2')).replace('cholz','escharni')).replace('59p69','41p53')  ## assuming same pfix!! 
+    file1L2018 = ((file.replace('templatesSR_July_MVA_Update_Round2','templatesSR_July2019_With_Uncertainties')).replace('escharni','cholz')).replace('41p53','59p69')  ## assuming same pfix!! 
     print '-------------------------------------'
-    print 'Using 2017 file:',file1L2017
-    print 'Using 2018 file:',file
+    print 'Using 2017 file:',file
+    print 'Using 2018 file:',file1L2018
     
     ## save for later when combining with other final states
     ## need to think of a system for 1L, 2L, 3L having unique ROOT file names without the path. Lumi should separate years. 
@@ -239,10 +240,10 @@ for file in rootfilelist:
     print signal,BRStr
     if not os.path.exists(outDir): os.system('mkdir -p '+outDir)
     os.chdir(outDir)
-    makeThetaConfig(file1L2016,file1L2017,file,file2L2016,file2L2017,file2L2018,file3L2016,file3L2017,file3L2018,outDir,signal+BRStr)
+    makeThetaConfig(file1L2016,file,file1L2018,file2L2016,file2L2017,file2L2018,file3L2016,file3L2017,file3L2018,outDir,signal+BRStr)
     
     ## ADD MORE FILES WHEN COMBINING MORE YEARS AND FINAL STATES
-    dict={'rundir':runDir,'configdir':outDir,'configfile':file.split('/')[-1][:-5],'file1L17':file1L2017,'file1L18':file}
+    dict={'rundir':runDir,'configdir':outDir,'configfile':file.split('/')[-1][:-5],'file1L17':file,'file1L18':file1L2018}
 
     jdf=open(file.split('/')[-1][:-5]+'.job','w')
     jdf.write(

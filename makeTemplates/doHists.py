@@ -17,13 +17,12 @@ gROOT.SetBatch(1)
 start_time = time.time()
 
 lumiStr = str(targetlumi/1000).replace('.','p') # 1/fb
-step1Dir = 'root://cmseos.fnal.gov//store/user/cholz/FWLJMET102X_1lep2018Dnn_080819_step2hadds_TTandBB'
-
+step1Dir = 'root://cmseos.fnal.gov//store/user/bburgsta/FWLJMET102X_1lep2016Dnn_042720_step1hadds'
 iPlot = 'HT' #minMlb' #choose a discriminant from plotList below!
 if len(sys.argv)>2: iPlot=sys.argv[2]
-region = 'CR'
+region = 'PS'
 if len(sys.argv)>3: region=sys.argv[3]
-isCategorized = True
+isCategorized = False
 if len(sys.argv)>4: isCategorized=int(sys.argv[4])
 doJetRwt= 1
 doTopRwt= 0
@@ -47,17 +46,18 @@ where <shape> is for example "JECUp". hadder.py can be used to prepare input fil
 """
 
 bkgList = [
-	'DYMG200','DYMG400','DYMG600','DYMG800','DYMG1200','DYMG2500','WJetsMG200','WJetsMG400','WJetsMG600','WJetsMG800','WJetsMG1200','WJetsMG2500',
-	'TTJetsHad0','TTJetsHad700','TTJetsHad1000','TTJetsSemiLep0','TTJetsSemiLep700','TTJetsSemiLep1000','TTJets2L2nu0','TTJets2L2nu700','TTJets2L2nu1000',
-	'TTJetsPH700mtt','TTJetsPH1000mtt','Ts','Tbt','Tt','TtW','TbtW','TTWl','TTZl',
-	'WW','WZ','ZZ','ttHToNonbb','ttHTobb','QCDht500','QCDht700','QCDht1000','QCDht1500','QCDht2000'
+	'DYMG400','DYMG600','DYMG800','DYMG1200','DYMG2500',
+	'WJetsMG400','WJetsMG600','WJetsMG800','WJetsMG1200','WJetsMG2500',
+	'TTJets0','TTJets700','TTJets1000','TTJetsPS0','TTJetsPS700','TTJetsPS1000',
+	'TTJetsPH700mtt','TTJetsPH1000mtt',
+	'Ts','Tt','Tbt','TtW','TbtW','TTWl','TTZl','TTHB','TTHnoB',
+	'WW','WZ','ZZ',
+	'QCDht500','QCDht700','QCDht1000','QCDht1500','QCDht2000'
 	]
 
 dataList = [
-	'DataEABCD',
-	'DataMABCD',
-	#'Data18EG',
-	#'Data18MU',
+	'DataEBCDEFG',
+	'DataMBCDEFG',
 	]
 
 whichSignal = 'BB' #HTB, TT, BB, or X53X53
@@ -71,13 +71,14 @@ if whichSignal=='BB': decays = ['TWTW','BHBH','BZBZ','BZTW','BHTW','BZBH'] #B' d
 cutList = {'lepPtCut':55,'metCut':50,'nAK8Cut':3,'dnnCut':0.50,'HTCut':510} ## also requires mass reco worked
 if 'CR' in region :cutList = {'lepPtCut':55,'metCut':50,'nAK8Cut':3,'dnnCut':0.50,'HTCut':510} 
 if 'PS' in region :cutList = {'lepPtCut':55,'metCut':50,'nAK8Cut':0,'dnnCut':0.0,'HTCut':510} ## most basic
-		
+
 if len(sys.argv)>5: isEMlist=[str(sys.argv[5])]
-else: isEMlist = ['E','M']
+else: isEMlist = ['E']
 if len(sys.argv)>6: taglist=[str(sys.argv[6])]
 else: 
 	taglist = ['all']
-	if isCategorized: taglist=['taggedbWbW','taggedtHbW','taggedtHtH','taggedtZbW','taggedtZtH','taggedtZtZ','taggedtZHtZH','notV']
+	if isCategorized and whichSignal == 'TT': taglist=['taggedbWbW','taggedtHbW','taggedtHtH','taggedtZbW','taggedtZtH','taggedtZtZ','taggedtZHtZH','notV']
+	elif isCategorized and whichSignal == 'BB': taglist=['taggedtWtW','taggedbHtW','taggedbHbH','taggedbZtW','taggedbZbH','taggedbZbZ','notV']
 if len(sys.argv)>7: algolist=[str(sys.argv[7])]
 else: 
 	algolist = ['all']
@@ -95,25 +96,24 @@ if isCategorized and 'SR' in region:
 plotList = {#discriminantName:(discriminantLJMETName, binning, xAxisLabel)
         'tmass':('t_mass',linspace(0,500,51).tolist(),';M(t) [GeV]'),
         'Wmass':('W_mass',linspace(0,250,51).tolist(),';M(W) [GeV]'),
-        'tpt':('t_pt',linspace(0,1000,51).tolist(),';top pt [GeV]'),
-        'Wpt':('W_pt',linspace(0,1000,51).tolist(),';W Boson pt [GeV]'),
+        'tpt':('t_pt',linspace(0,1000,51).tolist(),';tpt [GeV]'),
+        'Wpt':('W_pt',linspace(0,1000,51).tolist(),';Wpt [GeV]'),
         'Wdrlep':('W_dRLep',linspace(0,5,51).tolist(),';leptonic W, #DeltaR(W,lepton)'),
         'tdrWb':('t_dRWb',linspace(0,5,51).tolist(),';leptonic t, #DeltaR(W,b)'),
-	'isLepW':('isLeptonic_W',linspace(0,2,3).tolist(),';lepton from W'),
-        'Tp1Mass':('Tprime1_DeepAK8_Mass',linspace(0,4000,51).tolist(),';M(T) [GeV]'), ## replace with ALGO if needed
-        'Tp2Mass':('Tprime2_DeepAK8_Mass',linspace(0,4000,nbins).tolist(),';M(T) [GeV]'),
-        'Tp2MDnn':('Tprime2_DeepAK8_Mass',linspace(0,4000,nbins).tolist(),';M(T) [GeV]'), #analyze.py makes notV DnnTprime
-        'Tp2MST':('Tprime2_DeepAK8_Mass',linspace(0,4000,nbins).tolist(),';M(T) [GeV]'), #analyze.py makes notV ST
-        'Tp1Pt':('Tprime1_DeepAK8_Pt',linspace(0,3000,51).tolist(),';T quark p_{T} [GeV]'),
-        'Tp2Pt':('Tprime2_DeepAK8_Pt',linspace(0,3000,51).tolist(),';T quark p_{T} [GeV]'),
-        'Tp1Eta':('Tprime1_DeepAK8_Eta',linspace(-5,5,51).tolist(),';T quark #eta'),
-        'Tp2Eta':('Tprime2_DeepAK8_Eta',linspace(-5,5,51).tolist(),';T quark #eta'),
-        'Tp1Phi':('Tprime1_DeepAK8_Phi',linspace(-3.14,3.14).tolist(),';T quark #phi'),
-        'Tp2Phi':('Tprime2_DeepAK8_Phi',linspace(-3.14,3.14,51).tolist(),';T quark #phi'),
-        'Tp1deltaR':('Tprime1_DeepAK8_deltaR',linspace(0,5,51).tolist(),';#DeltaR(T quark product jets)'),
-        'Tp2deltaR':('Tprime2_DeepAK8_deltaR',linspace(0,5,51).tolist(),';#DeltaR(T quark product jets)'),
-
-        'Bp1Mass':('Bprime1_DeepAK8_Mass',linspace(0,4000,51).tolist(),';M(B) [GeV]'), ## replace with ALGO if needed
+	      'isLepW':('isLeptonic_W',linspace(0,2,3).tolist(),';lepton from W'),
+        'Tp1Mass':('Tprime1_DeepAK8_Mass',linspace(0,4000,51).tolist(),';M(lepT) [GeV]'), ## replace with ALGO if needed
+        'Tp2Mass':('Tprime2_DeepAK8_Mass',linspace(0,4000,nbins).tolist(),';M(hadT) [GeV]'),
+        'Tp2MDnn':('Tprime2_DeepAK8_Mass',linspace(0,4000,nbins).tolist(),';M(hadT) [GeV]'), #analyze.py makes notV DnnTprime
+        'Tp2MST':('Tprime2_DeepAK8_Mass',linspace(0,4000,nbins).tolist(),';M(hadT) [GeV]'), #analyze.py makes notV ST
+        'Tp1Pt':('Tprime1_DeepAK8_Pt',linspace(0,3000,51).tolist(),';lepT quark p_{T} [GeV]'),
+        'Tp2Pt':('Tprime2_DeepAK8_Pt',linspace(0,3000,51).tolist(),';hadT quark p_{T} [GeV]'),
+        'Tp1Eta':('Tprime1_DeepAK8_Eta',linspace(-5,5,51).tolist(),';lepT quark #eta'),
+        'Tp2Eta':('Tprime2_DeepAK8_Eta',linspace(-5,5,51).tolist(),';hadT quark #eta'),
+        'Tp1Phi':('Tprime1_DeepAK8_Phi',linspace(-3.14,3.14).tolist(),';lepT quark #phi'),
+        'Tp2Phi':('Tprime2_DeepAK8_Phi',linspace(-3.14,3.14,51).tolist(),';hadT quark #phi'),
+        'Tp1deltaR':('Tprime1_DeepAK8_deltaR',linspace(0,5,51).tolist(),';#DeltaR(lepT quark product jets)'),
+        'Tp2deltaR':('Tprime2_DeepAK8_deltaR',linspace(0,5,51).tolist(),';#DeltaR(hadT quark product jets)'),
+	      'Bp1Mass':('Bprime1_DeepAK8_Mass',linspace(0,4000,51).tolist(),';M(B) [GeV]'), ## replace with ALGO if needed
         'Bp2Mass':('Bprime2_DeepAK8_Mass',linspace(0,4000,nbins).tolist(),';M(B) [GeV]'),
         'Bp2MDnn':('Bprime2_DeepAK8_Mass',linspace(0,4000,nbins).tolist(),';M(B) [GeV]'), #analyze.py makes notV DnnBprime
         'Bp2MST':('Bprime2_DeepAK8_Mass',linspace(0,4000,nbins).tolist(),';M(B) [GeV]'), #analyze.py makes notV ST
@@ -165,8 +165,10 @@ plotList = {#discriminantName:(discriminantLJMETName, binning, xAxisLabel)
 	'MET'   :('corr_met_MultiLepCalc',linspace(0, 1500, 51).tolist(),';#slash{E}_{T} [GeV];'),
 	'METmod'   :('corr_metmod_MultiLepCalc',linspace(0, 1500, 51).tolist(),';modified #slash{E}_{T} [GeV];'),
 	'NJets' :('NJets_JetSubCalc',linspace(0, 15, 16).tolist(),';jet multiplicity;'),
-	'NBJets':('NJetsCSVwithSF_JetSubCalc',linspace(0, 10, 11).tolist(),';b tag multiplicity;'),
-	'NBJetsNoSF':('NJetsCSV_JetSubCalc',linspace(0, 10, 11).tolist(),';b tag multiplicity;'),
+	'NBJets':('NJetsDeepCSVwithSF_JetSubCalc',linspace(0, 10, 11).tolist(),';b tag multiplicity;'),
+	'NBJetsNoSF':('NJetsDeepCSV_JetSubCalc',linspace(0, 10, 11).tolist(),';b tag multiplicity;'),
+   'NBDeepJets':('NJetsDeepFlavwithSF_JetSubCalc',linspace(0, 10, 11).tolist(),';b tag multiplicity;'),
+   'NBDeepJetsNoSF':('NJetsDeepFlav_JetSubCalc',linspace(0, 10, 11).tolist(),';b tag multiplicity;'),
 	'NJetsAK8':('NJetsAK8_JetSubCalc',linspace(0, 8, 9).tolist(),';AK8 Jet multiplicity;'),
 	'JetPtAK8':('theJetAK8Pt_JetSubCalc_PtOrdered',linspace(0, 1500, 51).tolist(),';AK8 Jet p_{T} [GeV];'),
 	'JetPtBinsAK8':('theJetAK8Pt_JetSubCalc_PtOrdered',bigbins,';AK8 Jet p_{T} [GeV];'),

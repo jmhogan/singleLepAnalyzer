@@ -10,10 +10,11 @@ from tdrStyle import *
 setTDRStyle()
 
 blind=True
+combination=True
 saveKey=''
 signal = 'T'
-lumiPlot = '59.7'# '97.4'#
-lumiStr = '59p69'
+lumiPlot = '41.5'# '97.4'#
+lumiStr = '41p53'
 chiral=''#'right'
 discriminant=str(sys.argv[1]) #'DnnTprime' #'Tp2MDnn' #'Tp2Mass' #
 histPrefix=discriminant+'_'+str(lumiStr)+'fb'+chiral
@@ -169,7 +170,7 @@ def PlotLimits(limitDir,limitFile,tempKey):
     c4.SetLogy()
 
     expected95.Draw("a3")
-    if signal == 'T': expected95.GetYaxis().SetRangeUser(.0002+.00001,2.01)
+    if signal == 'T': expected95.GetYaxis().SetRangeUser(.0005+.00001,2.01)
     else: expected95.GetYaxis().SetRangeUser(.002+.00001,80.1)
     expected95.GetXaxis().SetRangeUser(1100,1800)
     if tempKey=='nB0': expected95.GetYaxis().SetRangeUser(.008+.00001,25.45)   
@@ -265,8 +266,8 @@ def PlotLimits(limitDir,limitFile,tempKey):
     
     c4.RedrawAxis()
     
-    folder = '/uscms_data/d3/cholz/CMSSW_10_2_10/src/singleLepAnalyzer/thetaLimits/'
-    outDir=folder+'/plots_July19/July2019_With_Uncertainties/'
+    folder = '/uscms_data/d3/escharni/CMSSW_10_2_10/src/singleLepAnalyzer/thetaLimits/'
+    outDir=folder+'/plots_Jul19/July_MVA_Update_Round2/'
     #outDir = folder
     if not os.path.exists(outDir): os.system('mkdir -p '+outDir)
     c4.SaveAs(outDir+'/LimitPlot_'+histPrefix+isRebinned+saveKey+'_'+tempKey+'.root')
@@ -289,6 +290,7 @@ nBRconf=len(BRs['BW'])
 if not doBRScan: nBRconf=1
 
 tempKeys = ['DeepAK8']#['comb123']#,'isE','isM','nW0','nW1p','nB0','nB1','nB2','nB3p']#
+if combination: tempKeys = ['comb1718']
 
 expLims = []
 obsLims = []
@@ -299,12 +301,15 @@ for tempKey in tempKeys:
 			if signal=='T': BRconfStr='_bW'+str(BRs['BW'][BRind]).replace('.','p')+'_tZ'+str(BRs['TZ'][BRind]).replace('.','p')+'_tH'+str(BRs['TH'][BRind]).replace('.','p')
 			else: BRconfStr='_tW'+str(BRs['BW'][BRind]).replace('.','p')+'_bZ'+str(BRs['TZ'][BRind]).replace('.','p')+'_bH'+str(BRs['TH'][BRind]).replace('.','p')
 		#limitDir='/uscms_data/d3/saj32265/CMSSW_9_4_6_patch1/src/singleLepAnalyzer/thetaLimits/limitsAug18/'
-		limitDir='/uscms_data/d3/cholz/CMSSW_10_2_10/src/singleLepAnalyzer/thetaLimits/limitsJuly2019/templatesSR_July2019_With_Uncertainties/'+discriminant+BRconfStr+'/'
+		limitDir='/uscms_data/d3/escharni/CMSSW_10_2_10/src/singleLepAnalyzer/thetaLimits/limitsJul19/templatesSR_July_MVA_Update_Round2/'+discriminant+BRconfStr+'/'
 		if signal=='B': limitDir='/user_data/jhogan/CMSSW_7_4_14/src/tptp_2016/thetaLimits/limitsOct17/templates4CRhtSR_BB_NewEl/'+discriminant+BRconfStr+'/'
 		if tempKey=='ssdltest': limitDir='/user_data/jhogan/CMSSW_7_4_14/src/tptp_2016/thetaLimits/limitsOct17/templates4CRhtSR_NewEl/'+tempKey+'_bW0p5_tZ0p25_tH0p25/splitLess/'
 				
 		limitFile='/limits_templates_'+discriminant+'_'+signal+signal+'M1100'+chiral+BRconfStr+'_'+str(lumiStr)+'fb'+isRebinned+'_'+tempKey+'_expected.txt'
 		if 'ssdl' in tempKey: limitFile='/limits_Limits_'+signal+signal+'M1100'+chiral+BRconfStr+'_All_LL40_SL35_HT1200_nConst4_expected.txt'
+		if tempKey=='comb1718':
+			limitDir='/uscms_data/d3/escharni/CMSSW_10_2_10/src/singleLepAnalyzer/thetaLimits/limitsJul19/templatesSR_July_MVA_Update_Round2/'+tempKey+BRconfStr+'/templatesSR_July_MVA_Update_Round2/'
+			limitFile='limits_templates_'+discriminant+'_'+signal+signal+'M1100'+chiral+BRconfStr+'_'+str(lumiStr)+'fb'+isRebinned+'_expected.txt'
 		try: 		
 			expTemp,obsTemp = PlotLimits(limitDir,limitFile,tempKey+BRconfStr)
 			expLims.append(expTemp)

@@ -6,7 +6,7 @@ input = 'FILE'
 rFileName = input.split('/')[-1][:-5]+'_DeepAK8'
                                                                           
 def get_model():
-    model = build_model_from_rootfile(input,include_mc_uncertainties=True,histogram_filter = (lambda s: s.count('Best')==0))
+    model = build_model_from_rootfile(input,include_mc_uncertainties=True,histogram_filter = (lambda s: s.count('Jeff')==0 and s.count('Jmis')==0))
 
     #
     model.fill_histogram_zerobins()
@@ -18,34 +18,30 @@ def get_model():
 
     for obs in obsvs:
         if 'isE' in obs:
-            try: model.add_lognormal_uncertainty('elIdSys', math.log(1.02), '*', obs) #(uncert name, magnitude, which process to apply to, which channel/observable)
+            try: model.add_lognormal_uncertainty('elIdSys', math.log(1.027), '*', obs) #(uncert name, magnitude, which process to apply to, which channel/observable)
             except: pass
-            try: model.add_lognormal_uncertainty('elIsoSys', math.log(1.01), '*', obs) #iso + reco
-            except: pass
-            try: model.add_lognormal_uncertainty('elTrigSys', math.log(1.05), '*', obs) #iso + reco
-            except: pass
-            try: model.add_lognormal_uncertainty('elRecoSys', math.log(1.01), '*', obs) #iso + reco
-            except: pass
+            # try: model.add_lognormal_uncertainty('elIsoSys', math.log(1.01), '*', obs) #iso + reco
+            # except: pass
+            # try: model.add_lognormal_uncertainty('elRecoSys', math.log(1.01), '*', obs) #iso + reco
+            # except: pass
         elif 'isM' in obs:
-            try: model.add_lognormal_uncertainty('muIdSys', math.log(1.02), '*', obs)
+            try: model.add_lognormal_uncertainty('muIdSys', math.log(1.027), '*', obs)
             except: pass
-            try: model.add_lognormal_uncertainty('muIsoSys', math.log(1.01), '*', obs) #iso + tracking
-            except: pass
-            try: model.add_lognormal_uncertainty('muTrigSys', math.log(1.05), '*', obs) #iso + tracking
-            except: pass
-            try: model.add_lognormal_uncertainty('muRecoSys', math.log(1.01), '*', obs) #iso + tracking
-            except: pass
+            # try: model.add_lognormal_uncertainty('muIsoSys', math.log(1.01), '*', obs) #iso + tracking
+            # except: pass
+            # try: model.add_lognormal_uncertainty('muRecoSys', math.log(1.01), '*', obs) #iso + tracking
+            # except: pass
 
-    try: model.add_lognormal_uncertainty('lumiSys', math.log(1.023), '*', '*')
+    try: model.add_lognormal_uncertainty('lumiSys', math.log(1.025), '*', '*')
     except: pass
 
     # flat values for tests
-    #try: model.add_lognormal_uncertainty('QCDscale', math.log(1.25),'qcd','*')
-    #except RuntimeError: pass
-    #try: model.add_lognormal_uncertainty('TTbarscale', math.log(1.30),'top','*')
-    #except RuntimeError: pass
-    #try: model.add_lognormal_uncertainty('EWKscale', math.log(1.25),'ewk','*')
-    #except RuntimeError: pass
+    # try: model.add_lognormal_uncertainty('QCDscale', math.log(1.25),'qcd','*')
+    # except RuntimeError: pass
+    # try: model.add_lognormal_uncertainty('TTbarscale', math.log(1.30),'top','*')
+    # except RuntimeError: pass
+    # try: model.add_lognormal_uncertainty('EWKscale', math.log(1.25),'ewk','*')
+    # except RuntimeError: pass
     # try: model.add_lognormal_uncertainty('jsf', math.log(1.038), 'WJets', '*')
     # except: pass
     # try: model.add_lognormal_uncertainty('muRFcorrdNewDYJets', math.log(1.15), 'DYJets', '*')
@@ -64,6 +60,8 @@ model = get_model()
 model_summary(model)
 
 plot_exp, plot_obs = bayesian_limits(model,'all', n_toy = 3000, n_data = 300)
+#plot_exp, plot_obs = asymptotic_cls_limits(model, use_data=False, signal_process_groups={'sig':['sig']}, beta_signal_expected=0.0, bootstrap_model=False)
+#plot_exp.write_txt('limitsAsympCLS_'+rFileName+'_expected.txt')
 
 plot_exp.write_txt('limits_'+rFileName+'_expected.txt')
 ##plot_obs.write_txt('limits_'+rFileName+'_observed.txt')

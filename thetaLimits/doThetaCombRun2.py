@@ -7,7 +7,6 @@ import os,sys,fnmatch
 # from unc_pdf import *
 # from unc_pu import *
 # from unc_scale import *
-
 runDir='/uscms_data/d3/escharni/CMSSW_10_2_10/src/singleLepAnalyzer'
 templateDir=runDir+'/makeTemplates/templatesSR_July_MVA_Update_Round2'
 

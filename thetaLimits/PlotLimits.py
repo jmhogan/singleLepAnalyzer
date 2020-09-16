@@ -1,4 +1,4 @@
-from ROOT import *
+from ROOT import gROOT, TFile, TH1D, TCanvas, TLegend, TVectorD, TGraphAsymmErrors, TGraph, TLatex
 from array import array
 import math
 from math import *
@@ -10,26 +10,33 @@ from tdrStyle import *
 setTDRStyle()
 
 blind=True
-combination=True
+combination=False
+ACLS = False
 saveKey=''
+if ACLS: saveKey='_ACLS_'
 signal = 'T'
-lumiPlot = '41.5'# '97.4'#
-lumiStr = '41p53'
+lumiPlot = '35.9'# '97.4'#
+lumiStr = '35p867'
 chiral=''#'right'
 discriminant=str(sys.argv[1]) #'DnnTprime' #'Tp2MDnn' #'Tp2Mass' #
 histPrefix=discriminant+'_'+str(lumiStr)+'fb'+chiral
 stat='0.3'#0.75
-isRebinned='_rebinned_stat'+str(stat).replace('.','p')#+'_renamed'
+isRebinned='_rebinned_stat'+str(stat).replace('.','p')+'_smoothed'
 #cutString='lep40_MET75_1jet300_2jet150_NJets3_NBJets0_3jet100_4jet0_5jet0_DR1_1Wjet0_1bjet0_HT0_ST0_minMlb0'
 cutString=''#split'
 
-mass = array('d', [1100,1200,1300,1400,1500,1600,1700,1800])#
-masserr = array('d', [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0])#
-mass_str = ['1100','1200','1300','1400','1500','1600','1700','1800']#
+#mass = array('d', [1100,1200,1300,1400,1500,1600,1700,1800])#
+#masserr = array('d',[0 for i in range(len(mass))])
+#mass_str = ['1100','1200','1300','1400','1500','1600','1700','1800']#
+
+mass = array('d', [900,1100,1200,1300,1400,1500,1600,1700,1800])#800,
+mass_str = ['900','1100','1200','1300','1400','1500','1600','1700','1800']#'800'
+
 #mass = array('d', [900,1000,1100,1200,1300,1400,1500])#800,,1600,1700,1800
 #masserr = array('d', [0,0,0,0,0,0,0])#0,,0,0,0
 #mass_str = ['900','1000','1100','1200','1300','1400','1500']#'800','1600','1700','1800'
 
+masserr = array('d', [0 for i in range(len(mass))])
 exp   =array('d',[0 for i in range(len(mass))])
 experr=array('d',[0 for i in range(len(mass))])
 obs   =array('d',[0 for i in range(len(mass))])
@@ -39,13 +46,18 @@ exp68L=array('d',[0 for i in range(len(mass))])
 exp95H=array('d',[0 for i in range(len(mass))])
 exp95L=array('d',[0 for i in range(len(mass))])
 
-xsec = array('d', [1,1,1,1,1,1,1,1,1,1,1])
+xsec = array('d',[1 for i in range(len(mass))])
 if chiral=='right':theory_xsec  = [0.190,0.0877,0.0427,0.0217,0.0114,0.00618,0.00342,0.00193,0.00111]
 elif chiral=='left':theory_xsec = [0.190,0.0877,0.0427,0.0217,0.0114,0.00618,0.00342,0.00193,0.00111]
 else: print "Using TT xsec, for XX enter left or right"
-theory_xsec = [0.0224,0.0118,0.00639,0.00354,0.00200,0.001148,0.000666,0.000391]#pb#
-xsecErrUp = [1.1,0.64,0.37,0.22,0.14,0.087,0.056,0.037]#fb 
-xsecErrDn = [1.0,0.56,0.32,0.19,0.12,0.072,0.045,0.029]#fb 
+#theory_xsec = [0.0224,0.0118,0.00639,0.00354,0.00200,0.001148,0.000666,0.000391]#pb#
+#xsecErrUp = [1.1,0.64,0.37,0.22,0.14,0.087,0.056,0.037]#fb 
+#xsecErrDn = [1.0,0.56,0.32,0.19,0.12,0.072,0.045,0.029]#fb 
+
+theory_xsec = [0.0903,0.0224,0.0118,0.00639,0.00354,0.00200,0.001148,0.000666,0.000391]#pb#
+xsecErrUp = [4.0,1.1,0.64,0.37,0.22,0.14,0.087,0.056,0.037]#fb 
+xsecErrDn = [3.8,1.0,0.56,0.32,0.19,0.12,0.072,0.045,0.029]#fb 
+
 #theory_xsec = [0.0903,0.0440,0.0224,0.0118,0.00639,0.00354,0.00200]#pb#0.196, ,0.001148,0.000666,0.000391
 #xsecErrUp = [4.0,2.1,1.1,0.64,0.37,0.22,0.14]#fb 8.5,,0.087,0.056,0.037
 #xsecErrDn = [3.8,1.9,1.0,0.56,0.32,0.19,0.12]#fb 8.1,,0.072,0.045,0.029
@@ -84,17 +96,17 @@ def PlotLimits(limitDir,limitFile,tempKey):
     print
     print 'mass'.ljust(ljust_i), 'observed'.ljust(ljust_i), 'expected'.ljust(ljust_i), '-2 Sigma'.ljust(ljust_i), '-1 Sigma'.ljust(ljust_i), '+1 Sigma'.ljust(ljust_i), '+2 Sigma'.ljust(ljust_i)
     
-    limExpected = 1100
-    limObserved = 1100
+    limExpected = 900
+    limObserved = 900
     for i in range(len(mass)):
         lims = {}
         
-        if blind:fobs = open(limitDir+cutString+limitFile.replace(signal+signal+'M1100',signal+signal+'M'+mass_str[i]), 'rU')
-        if not blind: fobs = open(limitDir+cutString+limitFile.replace(signal+signal+'M1100',signal+signal+'M'+mass_str[i]).replace('expected','observed'), 'rU')
+        if blind:fobs = open(limitDir+cutString+limitFile.replace(signal+signal+'M900',signal+signal+'M'+mass_str[i]), 'rU')
+        if not blind: fobs = open(limitDir+cutString+limitFile.replace(signal+signal+'M900',signal+signal+'M'+mass_str[i]).replace('expected','observed'), 'rU')
         linesObs = fobs.readlines()
         fobs.close()
         
-        fexp = open(limitDir+cutString+limitFile.replace(signal+signal+'M1100',signal+signal+'M'+mass_str[i]), 'rU')
+        fexp = open(limitDir+cutString+limitFile.replace(signal+signal+'M900',signal+signal+'M'+mass_str[i]), 'rU')
         linesExp = fexp.readlines()
         fexp.close()
         
@@ -130,8 +142,8 @@ def PlotLimits(limitDir,limitFile,tempKey):
     print
     signExp = "="
     signObs = "="
-    if limExpected==1100: signExp = "<"
-    if limObserved==1100: signObs = "<"
+    if limExpected==900: signExp = "<"
+    if limObserved==900: signObs = "<"
     print "Expected lower limit "+signExp,int(round(limExpected)),"GeV"
     print "Observed lower limit "+signObs,int(round(limObserved)),"GeV"
     print
@@ -172,7 +184,7 @@ def PlotLimits(limitDir,limitFile,tempKey):
     expected95.Draw("a3")
     if signal == 'T': expected95.GetYaxis().SetRangeUser(.0005+.00001,2.01)
     else: expected95.GetYaxis().SetRangeUser(.002+.00001,80.1)
-    expected95.GetXaxis().SetRangeUser(1100,1800)
+    expected95.GetXaxis().SetRangeUser(900,1800)
     if tempKey=='nB0': expected95.GetYaxis().SetRangeUser(.008+.00001,25.45)   
     expected95.GetXaxis().SetTitle(signal+" mass [GeV]")
     expected95.GetYaxis().SetTitle("#sigma ("+signal+"#bar{"+signal+"})[pb]")
@@ -266,8 +278,8 @@ def PlotLimits(limitDir,limitFile,tempKey):
     
     c4.RedrawAxis()
     
-    folder = '/uscms_data/d3/escharni/CMSSW_10_2_10/src/singleLepAnalyzer/thetaLimits/'
-    outDir=folder+'/plots_Jul19/July_MVA_Update_Round2/'
+    folder = '/uscms_data/d3/jmanagan/CMSSW_10_2_10/src/tptp_2016/thetaLimits/'
+    outDir=folder+'/plots_June2020/templatesSRCR_June2020TT/RevisedNuisances/'
     #outDir = folder
     if not os.path.exists(outDir): os.system('mkdir -p '+outDir)
     c4.SaveAs(outDir+'/LimitPlot_'+histPrefix+isRebinned+saveKey+'_'+tempKey+'.root')
@@ -283,9 +295,9 @@ def PlotLimits(limitDir,limitFile,tempKey):
 
 doBRScan = True
 BRs={}
-BRs['BW']=[0.0,0.50,0.0,1.0,0.0]#,0.0,0.0,0.0,0.0,0.0,0.0,0.2,0.2,0.2,0.2,0.2,0.4,0.4,0.4,0.4,0.6,0.6,0.6,0.8,0.8,1.0]#
-BRs['TH']=[0.5,0.25,1.0,0.0,0.0]#,0.0,0.2,0.4,0.6,0.8,1.0,0.0,0.2,0.4,0.6,0.8,0.0,0.2,0.4,0.6,0.0,0.2,0.4,0.0,0.2,0.0]#
-BRs['TZ']=[0.5,0.25,0.0,0.0,1.0]#,1.0,0.8,0.6,0.4,0.2,0.0,0.8,0.6,0.4,0.2,0.0,0.6,0.4,0.2,0.0,0.4,0.2,0.0,0.2,0.0,0.0]#
+BRs['BW']=[0.50]#,0.0,0.0,1.0,0.0]#,0.0,0.0,0.0,0.0,0.0,0.0,0.2,0.2,0.2,0.2,0.2,0.4,0.4,0.4,0.4,0.6,0.6,0.6,0.8,0.8,1.0]#
+BRs['TH']=[0.25]#,0.5,1.0,0.0,0.0]#,0.0,0.2,0.4,0.6,0.8,1.0,0.0,0.2,0.4,0.6,0.8,0.0,0.2,0.4,0.6,0.0,0.2,0.4,0.0,0.2,0.0]#
+BRs['TZ']=[0.25]#,0.5,0.0,0.0,1.0]#,1.0,0.8,0.6,0.4,0.2,0.0,0.8,0.6,0.4,0.2,0.0,0.6,0.4,0.2,0.0,0.4,0.2,0.0,0.2,0.0,0.0]#
 nBRconf=len(BRs['BW'])
 if not doBRScan: nBRconf=1
 
@@ -300,24 +312,26 @@ for tempKey in tempKeys:
 		if doBRScan: 
 			if signal=='T': BRconfStr='_bW'+str(BRs['BW'][BRind]).replace('.','p')+'_tZ'+str(BRs['TZ'][BRind]).replace('.','p')+'_tH'+str(BRs['TH'][BRind]).replace('.','p')
 			else: BRconfStr='_tW'+str(BRs['BW'][BRind]).replace('.','p')+'_bZ'+str(BRs['TZ'][BRind]).replace('.','p')+'_bH'+str(BRs['TH'][BRind]).replace('.','p')
-		#limitDir='/uscms_data/d3/saj32265/CMSSW_9_4_6_patch1/src/singleLepAnalyzer/thetaLimits/limitsAug18/'
-		limitDir='/uscms_data/d3/escharni/CMSSW_10_2_10/src/singleLepAnalyzer/thetaLimits/limitsJul19/templatesSR_July_MVA_Update_Round2/'+discriminant+BRconfStr+'/'
-		if signal=='B': limitDir='/user_data/jhogan/CMSSW_7_4_14/src/tptp_2016/thetaLimits/limitsOct17/templates4CRhtSR_BB_NewEl/'+discriminant+BRconfStr+'/'
-		if tempKey=='ssdltest': limitDir='/user_data/jhogan/CMSSW_7_4_14/src/tptp_2016/thetaLimits/limitsOct17/templates4CRhtSR_NewEl/'+tempKey+'_bW0p5_tZ0p25_tH0p25/splitLess/'
+		limitDir='/uscms_data/d3/jmanagan/CMSSW_10_2_10/src/tptp_2016/thetaLimits/limitsJune2020/templatesSRCR_June2020TT/RevisedNuisances/'+discriminant+BRconfStr+'/'
+		if ACLS: limitDir='/uscms_data/d3/jmanagan/CMSSW_10_2_10/src/tptp_2016/thetaLimits/limitsJune2020/templatesSRCR_June2020TT/RevisedNuisances/'+discriminant+'ACLS'+BRconfStr+'/'
+		if signal=='B': limitDir='/uscms_data/d3/jmanagan/CMSSW_10_2_10/src/tptp_2016/thetaLimits/limitsJune2020/templatesSRCR_June2020BB/'+discriminant+BRconfStr+'/'
 				
-		limitFile='/limits_templates_'+discriminant+'_'+signal+signal+'M1100'+chiral+BRconfStr+'_'+str(lumiStr)+'fb'+isRebinned+'_'+tempKey+'_expected.txt'
-		if 'ssdl' in tempKey: limitFile='/limits_Limits_'+signal+signal+'M1100'+chiral+BRconfStr+'_All_LL40_SL35_HT1200_nConst4_expected.txt'
+                histx = discriminant
+                if 'DnnTprime' in discriminant: histx = 'DnnTprime'
+		limitFile='/limits_templates_'+histx+'_'+signal+signal+'M900'+chiral+BRconfStr+'_'+str(lumiStr)+'fb'+isRebinned+'_'+tempKey+'_expected.txt'
+		if ACLS: limitFile='/limitsAsympCLS_templates_'+histx+'_'+signal+signal+'M900'+chiral+BRconfStr+'_'+str(lumiStr)+'fb'+isRebinned+'_'+tempKey+'_expected.txt'
+
 		if tempKey=='comb1718':
 			limitDir='/uscms_data/d3/escharni/CMSSW_10_2_10/src/singleLepAnalyzer/thetaLimits/limitsJul19/templatesSR_July_MVA_Update_Round2/'+tempKey+BRconfStr+'/templatesSR_July_MVA_Update_Round2/'
-			limitFile='limits_templates_'+discriminant+'_'+signal+signal+'M1100'+chiral+BRconfStr+'_'+str(lumiStr)+'fb'+isRebinned+'_expected.txt'
-		try: 		
-			expTemp,obsTemp = PlotLimits(limitDir,limitFile,tempKey+BRconfStr)
-			expLims.append(expTemp)
-			obsLims.append(obsTemp)
-		except: 
-			expLims.append(-1)
-			obsLims.append(-1)
-			pass
+			limitFile='limits_templates_'+discriminant+'_'+signal+signal+'M900'+chiral+BRconfStr+'_'+str(lumiStr)+'fb'+isRebinned+'_expected.txt'
+		#try: 		
+		expTemp,obsTemp = PlotLimits(limitDir,limitFile,tempKey+BRconfStr)
+		expLims.append(expTemp)
+		obsLims.append(obsTemp)
+		#except: 
+		#	expLims.append(-1)
+		#	obsLims.append(-1)
+		#	pass
 print "BRs_bW:",BRs['BW']
 print "BRs_tH:",BRs['TH']
 print "BRs_tZ:",BRs['TZ']

@@ -2,6 +2,7 @@
 
 targetlumi = 35867. # 1/pb
 targetlumi2017 = 41530.
+targetlumi2018 = 59690.
 
 genHTweight={}
 genHTweight['WJetsMG100'] = 0.998056#https://github.com/jmhogan/GenHTweight/blob/master/WJetsToLNuSFs.txt
@@ -78,6 +79,9 @@ nrunttJets = 76294178.0 # from integral 76294178.0, file TT_TuneCUETP8M2T4_13TeV
 nrunttJetsPS = 77746400.0 # from integral 77746400.0, file TT_TuneCUETP8M2T4_PSweights_13TeV-powheg-pythia8_Mtt0to700_1_hadd.root 
 nruntt1000 = 19085541.0 # from integral 19085541.0, file TT_Mtt-1000toInf_TuneCUETP8M2T4_13TeV-powheg-pythia8_hadd.root
 nruntt700 = 29685326.0 # from integral 29685326.0, file TT_Mtt-700to1000_TuneCUETP8M2T4_13TeV-powheg-pythia8_hadd.root
+nrunttJets2L2Nu = 63791484.0 # from integral 64310000.0, file TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8_Mtt0to700_1_hadd.root
+nruntthad = 132368556.0 # from integral 133448000.0.0, file TTToHadronic_TuneCP5_13TeV-powheg-pythia8_Mtt0to700_hadd.root
+nrunttJetsSemiLep = 100579948.0 # from integral 101400000.0, file TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_Mtt0to700_1_hadd.root
 
 nRun['TTJets0'] = nrunttJets*0.8832 + nrunttJetsPS*0.8832   # hadronic*BR(0-700)
 nRun['TTJets700'] = nrunttJets*0.0921 + nrunttJetsPS*0.0921 + nruntt700   #hadronic*BR(700-1000) + mass700*BR(hadronic)
@@ -85,11 +89,21 @@ nRun['TTJets1000'] = nrunttJets*0.02474 + nrunttJetsPS*0.02474 + nruntt1000  #ha
 nRun['TTJetsPS0'] = nrunttJetsPS*0.8832 + nrunttJets*0.8832  # semilept*BR(0-700)
 nRun['TTJetsPS700'] = nrunttJetsPS*0.0921 + nrunttJets*0.0921 + nruntt700   #semilept*BR(700-1000) + mass700*BR(semilept)
 nRun['TTJetsPS1000'] = nrunttJetsPS*0.02474 + nrunttJets*0.02474 + nruntt1000   #semilept*BR(1000+) + mass1000*BR(semilept)
-#nRun['TTJets2L2nu0'] = nrunttJets2L2Nu*0.8832  #dilepton*BR(0-700)
-#nRun['TTJets2L2nu700'] = nrunttJets2L2Nu*0.0921 + nruntt700*0.105 #dilepton*BR(700-1000) + mass700*BR(dilepton)
-#nRun['TTJets2L2nu1000'] = nrunttJets2L2Nu*0.02474 + nruntt1000*0.105 #dilepton*BR(1000+) + mass1000*BR(dilepton)
+nRun['TTJetsHad0'] = nruntthad*0.8832   # hadronic*BR(0-700)
+nRun['TTJetsHad700'] = nruntthad*0.0921 + nruntt700*0.457 #hadronic*BR(700-1000) + mass700*BR(hadronic)
+nRun['TTJetsHad1000'] = nruntthad*0.02474 + nruntt1000*0.457 #hadronic*BR(1000+) + mass1000*BR(hadronic
+nRun['TTJetsSemiLep0'] = nrunttJetsSemiLep*0.8832  # semilept*BR(0-700)
+nRun['TTJetsSemiLep700'] = nrunttJetsSemiLep*0.0921 + nruntt700*0.438 #semilept*BR(700-1000) + mass700*BR(semilept)
+nRun['TTJetsSemiLep1000'] = nrunttJetsSemiLep*0.02474 + nruntt1000*0.438 #semilept*BR(1000+) + mass1000*BR(semilept)
+nRun['TTJets2L2nu0'] = nrunttJets2L2Nu*0.8832  #dilepton*BR(0-700)
+nRun['TTJets2L2nu700'] = nrunttJets2L2Nu*0.0921 + nruntt700*0.105 #dilepton*BR(700-1000) + mass700*BR(dilepton)
+nRun['TTJets2L2nu1000'] = nrunttJets2L2Nu*0.02474 + nruntt1000*0.105 #dilepton*BR(1000+) + mass1000*BR(dilepton)
+
 nRun['TTJetsPH700mtt'] = nruntt700 + nrunttJets*0.0921 + nrunttJetsPS*0.0921 #mass700 + inclusive*BR(700)
 nRun['TTJetsPH1000mtt'] = nruntt1000 + nrunttJets*0.02474 + nrunttJetsPS*0.02474 #mass1000 + inclusive*BR(1000)
+#nRun['TTJetsPH700mtt'] = nruntt700 + nruntthad*0.0921 + nrunttJetsSemiLep*0.0921 + nrunttJets2L2Nu*0.0921 #mass700 + inclusive*BR(700)
+#nRun['TTJetsPH1000mtt'] = nruntt1000 + nruntthad*0.02474 + nrunttJetsSemiLep*0.02474 + nrunttJets2L2Nu*0.02474 #mass1000 + inclusive*BR(1000)
+
 
 nRun['Ts'] = 6105500.0 # from integral 9811800.0, file ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_hadd.root 
 nRun['Tbt'] = 39635800.0 # from integral 39635800.0, file ST_t-channel_antitop_4f_inclusiveDecays_13TeV_PSweights-powhegV2-madspin_1_hadd.root
@@ -312,6 +326,7 @@ nRun['BBM1600BHBH'] = BB1600*0.333*0.333
 nRun['BBM1700BHBH'] = BB1700*0.333*0.333
 nRun['BBM1800BHBH'] = BB1800*0.333*0.333
 
+
 # Cross sections for MC samples (in pb) -- most unchanged for 2017
 xsec={}
 xsec['DY'] = 6025.2 # https://twiki.cern.ch/twiki/bin/view/CMS/SummaryTable1G25ns
@@ -344,9 +359,16 @@ xsec['TTJets1000'] = 831.76*0.02474
 xsec['TTJetsPS0'] = 831.76*0.8832
 xsec['TTJetsPS700'] = 831.76*0.0921
 xsec['TTJetsPS1000'] = 831.76*0.02474
-#xsec['TTJets2L2nu0'] = 831.76*0.8832
-#xsec['TTJets2L2nu700'] = 831.76*0.0921
-#xsec['TTJets2L2nu1000'] = 831.76*0.02474
+xsec['TTJetsHad0'] = 831.76*0.8832*0.457  ## BRs from PDG Top Review 2018: 45.7%/43.8%/10.5% 0/1/2 leptons
+xsec['TTJetsHad700'] = 831.76*0.0921*0.457
+xsec['TTJetsHad1000'] = 831.76*0.02474*0.457
+xsec['TTJetsSemiLep0'] = 831.76*0.8832*0.438
+xsec['TTJetsSemiLep700'] = 831.76*0.0921*0.438
+xsec['TTJetsSemiLep1000'] = 831.76*0.02474*0.438
+xsec['TTJets2L2nu0'] = 831.76*0.8832*0.105
+xsec['TTJets2L2nu700'] = 831.76*0.0921*0.105
+xsec['TTJets2L2nu1000'] = 831.76*0.02474*0.105
+
 
 xsec['TTJetsPH700mtt'] = 831.76*0.0921 #(xsec*filtering coeff.)
 xsec['TTJetsPH1000mtt'] = 831.76*0.02474 #(xsec*filtering coeff.)

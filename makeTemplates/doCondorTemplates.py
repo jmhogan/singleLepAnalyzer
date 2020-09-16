@@ -5,7 +5,6 @@ if thisDir[-13:] == 'makeTemplates': runDir = thisDir[:-13]
 else: runDir = thisDir
 if os.getcwd()[-17:] == 'singleLepAnalyzer': os.chdir(os.getcwd()+'/makeTemplates/')
 outputDir = thisDir+'/'
-
 region='PS' #PS,SR,TTCR,WJCR
 
 categorize=0 #1==categorize into t/W/b/j, 0==only split into flavor
@@ -15,15 +14,15 @@ date='%i_%i_%i'%(cTime.year,cTime.month,cTime.day)
 time='%i_%i_%i'%(cTime.hour,cTime.minute,cTime.second)
 pfix = 'templates'+region
 if not categorize: pfix='kinematics'+region
-pfix+='_May2020TT_May9'
+pfix+='_TESTwithoutweight'
 
 iPlotList = [#distribution name as defined in "doHists.py"
 	### For signal region templates
-	'ST',
-	'Tp2Mass',
-	'Tp2MDnn',
-	'Tp2MST',
-	'DnnTprime',
+	#'ST',
+	#'Tp2Mass',
+	#'Tp2MDnn',
+	#'Tp2MST',
+	#'DnnTprime',
 	'HT',
 
 	## Require 3 AK8s
@@ -38,57 +37,57 @@ iPlotList = [#distribution name as defined in "doHists.py"
    #'Tp1deltaR',
    #'Tp2deltaR',
         
-	'probSumDecay',  	###Don't require 3 AK8s
-   'probSumFour',
-   'probb',
-   'probh',
-   'probj',
-   'probt',
-   'probw',
-   'probz',
-   'dnnLargest',
-   'nB',
-   'nH', 
-   'nT',
-   'nW', 
-   'nZ',
+   # 	'probSumDecay',  	###Don't require 3 AK8s
+   # 'probSumFour',
+   # 'probb',
+   # 'probh',
+   # 'probj',
+   # 'probt',
+   # 'probw',
+   # 'probz',
+   # 'dnnLargest',
+   # 'nB',
+   # 'nH', 
+   # 'nT',
+   # 'nW', 
+   # 'nZ',
 	
-	#Not algorithm dependent
-	'DnnTprime',
-	'DnnWJets',
-	'DnnTTbar',
-	'tmass',
-   'Wmass',
-	'tpt',
-	'Wpt',
-	'tdrWb',
-	'Wdrlep',	
-	'isLepW',
-	'HT',
-	'ST',
-	'JetPt', 
-	'MET',   
-	'NJets', 
-	'NBJets',
-	'NBDeepJets',
-	'NJetsAK8',
-	'JetPtAK8',
-	'lepPt', 
-	'SoftDrop',
-	'deltaRAK8',
-	'minMlj',
-	'mindeltaR',
-	'PtRel',
-	'mindeltaRAK8',
-	'PtRelAK8',
-	'lepEta',
-	'lepIso',
-	'JetEta',
-	'JetEtaAK8',
-	'NTrue',
-	'minMlb',
-	'METmod',
-	'minDPhiMetJet',
+   # 	#Not algorithm dependent
+   # 	'DnnTprime',
+   # 	'DnnWJets',
+   # 	'DnnTTbar',
+   # 	'tmass',
+   # 'Wmass',
+   # 	'tpt',
+   # 	'Wpt',
+   # 	'tdrWb',
+   # 	'Wdrlep',	
+   # 	'isLepW',
+   # 	'HT',
+   # 	'ST',
+   # 	'JetPt', 
+   # 	'MET',   
+   # 	'NJets', 
+   # 	'NBJets',
+   # 	'NBDeepJets',
+   # 	'NJetsAK8',
+   # 	'JetPtAK8',
+   # 	'lepPt', 
+   # 	'SoftDrop',
+   # 	'deltaRAK8',
+   # 	'minMlj',
+   # 	'mindeltaR',
+   # 	'PtRel',
+   # 	'mindeltaRAK8',
+   # 	'PtRelAK8',
+   # 	'lepEta',
+   # 	'lepIso',
+   # 	'JetEta',
+   # 	'JetEtaAK8',
+   # 	'NTrue',
+   # 	'minMlb',
+   # 	'METmod',
+   # 	'minDPhiMetJet',
 
 	## Not plotting for now
 	#'Tau21Nm1',
@@ -151,7 +150,7 @@ iPlotList = [#distribution name as defined in "doHists.py"
 	#'minMlbST'
 	]
 
-isEMlist = ['E'] # 'M','E'
+isEMlist = ['E','M']
 #isEMlist = ['L']
 
 #algolist = ['BEST','DeepAK8','DeepAK8DC']

@@ -1,17 +1,14 @@
 #!/usr/bin/python
 
-
 import os,sys,time,math,datetime,pickle,itertools,getopt
 from ROOT import TH1D,gROOT,TFile,TTree
 parent = os.path.dirname(os.getcwd())
 sys.path.append(parent)
 from numpy import linspace
-
 from weights import *
 from analyze import *
 from samples import *
 from utils import *
-
 
 gROOT.SetBatch(1)
 start_time = time.time()
@@ -60,9 +57,8 @@ dataList = [
 	'DataMBCDEFG',
 	]
 
-whichSignal = 'BB' #HTB, TT, BB, or X53X53
-#massList = range(1000,1800+1,100)
-massList = [1000,1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800]
+whichSignal = 'TT' #HTB, TT, BB, or X53X53
+massList = range(700,1800+1,100)
 sigList = [whichSignal+'M'+str(mass) for mass in massList]
 if whichSignal=='X53X53': sigList = [whichSignal+'M'+str(mass)+chiral for mass in massList for chiral in ['left','right']]
 if whichSignal=='TT': decays = ['BWBW','THTH','TZTZ','TZBW','THBW','TZTH'] #T' decays
@@ -100,7 +96,7 @@ plotList = {#discriminantName:(discriminantLJMETName, binning, xAxisLabel)
         'Wpt':('W_pt',linspace(0,1000,51).tolist(),';Wpt [GeV]'),
         'Wdrlep':('W_dRLep',linspace(0,5,51).tolist(),';leptonic W, #DeltaR(W,lepton)'),
         'tdrWb':('t_dRWb',linspace(0,5,51).tolist(),';leptonic t, #DeltaR(W,b)'),
-	      'isLepW':('isLeptonic_W',linspace(0,2,3).tolist(),';lepton from W'),
+	'isLepW':('isLeptonic_W',linspace(0,2,3).tolist(),';lepton from W'),
         'Tp1Mass':('Tprime1_DeepAK8_Mass',linspace(0,4000,51).tolist(),';M(lepT) [GeV]'), ## replace with ALGO if needed
         'Tp2Mass':('Tprime2_DeepAK8_Mass',linspace(0,4000,nbins).tolist(),';M(hadT) [GeV]'),
         'Tp2MDnn':('Tprime2_DeepAK8_Mass',linspace(0,4000,nbins).tolist(),';M(hadT) [GeV]'), #analyze.py makes notV DnnTprime
@@ -113,7 +109,7 @@ plotList = {#discriminantName:(discriminantLJMETName, binning, xAxisLabel)
         'Tp2Phi':('Tprime2_DeepAK8_Phi',linspace(-3.14,3.14,51).tolist(),';hadT quark #phi'),
         'Tp1deltaR':('Tprime1_DeepAK8_deltaR',linspace(0,5,51).tolist(),';#DeltaR(lepT quark product jets)'),
         'Tp2deltaR':('Tprime2_DeepAK8_deltaR',linspace(0,5,51).tolist(),';#DeltaR(hadT quark product jets)'),
-	      'Bp1Mass':('Bprime1_DeepAK8_Mass',linspace(0,4000,51).tolist(),';M(B) [GeV]'), ## replace with ALGO if needed
+	'Bp1Mass':('Bprime1_DeepAK8_Mass',linspace(0,4000,51).tolist(),';M(B) [GeV]'), ## replace with ALGO if needed
         'Bp2Mass':('Bprime2_DeepAK8_Mass',linspace(0,4000,nbins).tolist(),';M(B) [GeV]'),
         'Bp2MDnn':('Bprime2_DeepAK8_Mass',linspace(0,4000,nbins).tolist(),';M(B) [GeV]'), #analyze.py makes notV DnnBprime
         'Bp2MST':('Bprime2_DeepAK8_Mass',linspace(0,4000,nbins).tolist(),';M(B) [GeV]'), #analyze.py makes notV ST
@@ -125,7 +121,6 @@ plotList = {#discriminantName:(discriminantLJMETName, binning, xAxisLabel)
         'Bp2Phi':('Bprime2_DeepAK8_Phi',linspace(-3.14,3.14,51).tolist(),';B quark #phi'),
         'Bp1deltaR':('Bprime1_DeepAK8_deltaR',linspace(0,5,51).tolist(),';#DeltaR(B quark product jets)'),
         'Bp2deltaR':('Bprime2_DeepAK8_deltaR',linspace(0,5,51).tolist(),';#DeltaR(B quark product jets)'),
-
 	'DnnTprime':('dnn_Tprime',linspace(0,1,nbins).tolist(),';DNN T score'),
 	'DnnTTbar':('dnn_ttbar',linspace(0,1,51).tolist(),';DNN-T t#bar{t} score'),
 	'DnnWJets':('dnn_WJets',linspace(0,1,51).tolist(),';DNN-T W+jets score'),
@@ -167,8 +162,8 @@ plotList = {#discriminantName:(discriminantLJMETName, binning, xAxisLabel)
 	'NJets' :('NJets_JetSubCalc',linspace(0, 15, 16).tolist(),';jet multiplicity;'),
 	'NBJets':('NJetsDeepCSVwithSF_JetSubCalc',linspace(0, 10, 11).tolist(),';b tag multiplicity;'),
 	'NBJetsNoSF':('NJetsDeepCSV_JetSubCalc',linspace(0, 10, 11).tolist(),';b tag multiplicity;'),
-   'NBDeepJets':('NJetsDeepFlavwithSF_JetSubCalc',linspace(0, 10, 11).tolist(),';b tag multiplicity;'),
-   'NBDeepJetsNoSF':('NJetsDeepFlav_JetSubCalc',linspace(0, 10, 11).tolist(),';b tag multiplicity;'),
+	'NBDeepJets':('NJetsDeepFlavwithSF_JetSubCalc',linspace(0, 10, 11).tolist(),';b tag multiplicity;'),
+	'NBDeepJetsNoSF':('NJetsDeepFlav_JetSubCalc',linspace(0, 10, 11).tolist(),';b tag multiplicity;'),
 	'NJetsAK8':('NJetsAK8_JetSubCalc',linspace(0, 8, 9).tolist(),';AK8 Jet multiplicity;'),
 	'JetPtAK8':('theJetAK8Pt_JetSubCalc_PtOrdered',linspace(0, 1500, 51).tolist(),';AK8 Jet p_{T} [GeV];'),
 	'JetPtBinsAK8':('theJetAK8Pt_JetSubCalc_PtOrdered',bigbins,';AK8 Jet p_{T} [GeV];'),
@@ -267,36 +262,36 @@ for cat in catList:
 				for syst in shapesFiles:
 					for ud in ['Up','Down']: del tTreeBkg[bkg+syst+ud]
 
- 	for sig in sigList: 
- 	 	for decay in decays: 
-			print '-------------------------'
-			tTreeSig[sig+decay]=readTreeNominal(samples[sig+decay],step1Dir)
-			if doAllSys:
-				for syst in shapesFiles:
-					for ud in ['Up','Down']:
-						print "        "+syst+ud
-						tTreeSig[sig+decay+syst+ud]=readTreeShift(samples[sig+decay],syst.upper()+ud.lower(),step1Dir)
- 	 		sighists.update(analyze(tTreeSig,sig+decay,cutList,doAllSys,doJetRwt,iPlot,plotList[iPlot],category,region,isCategorized,whichSignal))
- 	 		if catInd==nCats: 
-				print 'deleting',sig+decay
-				del tTreeSig[sig+decay]
-				if doAllSys:
-					for syst in shapesFiles:
-						for ud in ['Up','Down']: del tTreeSig[sig+decay+syst+ud]
+ 	# for sig in sigList: 
+ 	#  	for decay in decays: 
+	# 		print '-------------------------'
+	# 		tTreeSig[sig+decay]=readTreeNominal(samples[sig+decay],step1Dir)
+	# 		if doAllSys:
+	# 			for syst in shapesFiles:
+	# 				for ud in ['Up','Down']:
+	# 					print "        "+syst+ud
+	# 					tTreeSig[sig+decay+syst+ud]=readTreeShift(samples[sig+decay],syst.upper()+ud.lower(),step1Dir)
+ 	#  		sighists.update(analyze(tTreeSig,sig+decay,cutList,doAllSys,doJetRwt,iPlot,plotList[iPlot],category,region,isCategorized,whichSignal))
+ 	#  		if catInd==nCats: 
+	# 			print 'deleting',sig+decay
+	# 			del tTreeSig[sig+decay]
+	# 			if doAllSys:
+	# 				for syst in shapesFiles:
+	# 					for ud in ['Up','Down']: del tTreeSig[sig+decay+syst+ud]
 
  	#Negative Bin Correction
 	for bkg in bkghists.keys(): negBinCorrection(bkghists[bkg])
- 	for sig in sighists.keys(): negBinCorrection(sighists[sig])
+ 	#for sig in sighists.keys(): negBinCorrection(sighists[sig])
 
  	# #OverFlow Correction
  	for data in datahists.keys(): overflow(datahists[data])
  	for bkg in bkghists.keys():   overflow(bkghists[bkg])
- 	for sig in sighists.keys():   overflow(sighists[sig])
+ 	#for sig in sighists.keys():   overflow(sighists[sig])
 
 	
  	pickle.dump(datahists,open(outDir+'/datahists_'+iPlot+'.p','wb'))
 	pickle.dump(bkghists,open(outDir+'/bkghists_'+iPlot+'.p','wb'))
-	pickle.dump(sighists,open(outDir+'/sighists_'+iPlot+'.p','wb'))
+	#pickle.dump(sighists,open(outDir+'/sighists_'+iPlot+'.p','wb'))
  	catInd+=1
 
 print("--- %s minutes ---" % (round((time.time() - start_time)/60,2)))

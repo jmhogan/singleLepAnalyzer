@@ -46,8 +46,8 @@ if 'BB' in pfix:
 	sig2='BBM1500' #  choose the 2nd signal to plot
 	sig2leg='B#bar{B} (1.5 TeV)'
 else:
-	sig1='TTM1100' #  choose the 1st signal to plot
-        sig1leg='T#bar{T} (1.1 TeV)'
+	sig1='TTM1200' #  choose the 1st signal to plot
+        sig1leg='T#bar{T} (1.2 TeV)'
         sig2='TTM1500' #  choose the 2nd signal to plot
         sig2leg='T#bar{T} (1.5 TeV)'
 drawNormalized = False # STACKS CAN'T DO THIS...bummer

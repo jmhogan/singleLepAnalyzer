@@ -14,24 +14,27 @@ start_time = time.time()
 lumi=35.9 #for plots #56.1 #
 lumiInTemplates= str(targetlumi/1000).replace('.','p') # 1/fb
 
-iPlot='HTNtag'
+iPlot='probj'
 if len(sys.argv)>1: iPlot=str(sys.argv[1])
-region='CR' #SR,TTCR,WJCR
+region='CR2j' #SR,TTCR,WJCR
 if len(sys.argv)>2: region=str(sys.argv[2])
-isCategorized=True
+isCategorized=False
 if len(sys.argv)>3: isCategorized=bool(eval(sys.argv[3]))
 pfix='templates'+region
 if not isCategorized: pfix='kinematics'+region
-pfix+='_June2020TT'
+pfix+='_Nov2020TT_HTcorr'
 if len(sys.argv)>4: pfix=str(sys.argv[4])
 templateDir=os.getcwd()+'/'+pfix+'/'
 
 print 'Plotting',region,'is categorized?',isCategorized
 
-isRebinned='_chi2_rebinned_stat0p15' #post for ROOT file names
+isRebinned=''#_chi2_rebinned_stat0p15' #post for ROOT file names
 if len(sys.argv)>7: 
         isRebinned='_rebinned_stat'+str(sys.argv[7])
-        if 'CR' in region and isCategorized: isRebinned='_chi2_rebinned_stat'+str(sys.argv[7])
+        if 'CR' in region and isCategorized: 
+                isRebinned='_chi2_rebinned_stat'+str(sys.argv[7])
+        elif 'TR' in region:
+                isRebinned='_rebinned_'+str(sys.argv[7])
 BRstr=''
 if isCategorized and 'BB' in pfix: BRstr='tW0p5_bZ0p25_bH0p25_'
 elif isCategorized: BRstr='bW0p5_tZ0p25_tH0p25_'
@@ -43,10 +46,10 @@ if 'BB' in pfix:
 	sig2='BBM1500' #  choose the 2nd signal to plot
 	sig2leg='B#bar{B} (1.5 TeV)'
 else:
-	sig1='TTM1400' #  choose the 1st signal to plot
-        sig1leg='T#bar{T} (1.4 TeV)'
-        sig2='TTM1400' #  choose the 2nd signal to plot
-        sig2leg='T#bar{T} (1.4 TeV)'
+	sig1='TTM1100' #  choose the 1st signal to plot
+        sig1leg='T#bar{T} (1.1 TeV)'
+        sig2='TTM1500' #  choose the 2nd signal to plot
+        sig2leg='T#bar{T} (1.5 TeV)'
 drawNormalized = False # STACKS CAN'T DO THIS...bummer
 scaleSignals = False
 if not isCategorized and 'CR' not in region: scaleSignals = True
@@ -62,14 +65,14 @@ if '53' in sig1: bkgHistColors = {'top':kRed-9,'ewk':kBlue-7,'qcd':kOrange-5} #X
 elif 'HTB' in sig1: bkgHistColors = {'ttbar':kGreen-3,'wjets':kPink-4,'top':kAzure+8,'ewk':kMagenta-2,'qcd':kOrange+5} #HTB
 else: bkgHistColors = {'top':kAzure+8,'ewk':kMagenta-2,'qcd':kOrange+5} #TT
 
-if len(isRebinned)>0: systematicList = ['prefire','pileup','jec2016','pdfNew2016','muRFcorrdNewTop','muRFcorrdNewEwk','muRFcorrdNewQCD','jsf','Teff','Tmis2016','Heff','Hmis2016','Zeff','Zmis2016','Weff','Wmis2016','Beff','Bmis2016','Jeff','Jmis2016','jer2016','elTrig2016','muTrig2016']
-else: systematicList = ['muRFcorrd']#,'pileup','trigeffEl','trigeffMu','jsf','Teff','Tmis','Heff','Hmis','Zeff','Zmis','Weff','Wmis','Beff','Bmis','Jeff','Jmis']#'jec','btag','jer','ltag'
+if len(isRebinned)>0 and 'TR' not in region: systematicList = ['toppt','prefire','pileup','jec2016','pdfNew2016','muRFcorrdNewTop','muRFcorrdNewEwk','muRFcorrdNewQCD','jsf','Teff','Tmis2016','Heff','Hmis2016','Zeff','Zmis2016','Weff','Wmis2016','Beff','Bmis2016','Jeff','Jmis2016','jer2016','elTrig2016','muTrig2016']
+else: systematicList = ['muRFcorrd','pileup','prefire','trigeffEl','trigeffMu','jsf','Teff','Tmis','Heff','Hmis','Zeff','Zmis','Weff','Wmis','Beff','Bmis','Jeff','Jmis','jec','btag','jer','ltag','toppt']
 
 doAllSys = True
 print 'doAllSys: ',doAllSys,'systematicList: ',systematicList
 addCRsys = False
 doNormByBinWidth=False
-if len(isRebinned)>0 and 'stat1p1' not in isRebinned: doNormByBinWidth = True
+if len(isRebinned)>0 and 'stat1p1' not in isRebinned and 'mvagof' not in isRebinned: doNormByBinWidth = True
 doOneBand = True
 # MAY NEED TO RE-INDENT PART/ALL OF CODE FROM HERE TO CORRESPONDING COMMENT!!!!!
 if not doAllSys: doOneBand = True # Don't change this!
@@ -97,7 +100,9 @@ if isCategorized == True:
 		taglist=['taggedtWtW','taggedbZtW','taggedbHtW','notVbH','notVbZ','notVtW','notV2pT','notV01T2pH','notV01T1H','notV1T0H','notV0T0H1pZ','notV0T0H0Z2pW','notV0T0H0Z01W']
 	else: 
 		taglist=['taggedbWbW','taggedtHbW','taggedtZbW','taggedtZHtZH','notVtH','notVtZ','notVbW','notV2pT','notV01T2pH','notV01T1H','notV1T0H','notV0T0H1pZ','notV0T0H0Z2pW','notV0T0H0Z01W']
-	if 'CR' in region: taglist=['dnnLargeT','dnnLargeH','dnnLargeZ','dnnLargeW','dnnLargeB','dnnLargeJwjet','dnnLargeJttbar']
+	if 'CR' in region: 
+                #taglist=['dnnLargeT','dnnLargeH','dnnLargeZ','dnnLargeW','dnnLargeB','dnnLargeJwjet','dnnLargeJttbar'] # HTNtag
+                taglist=['dnnLargeTHZWB','dnnLargeJwjet','dnnLargeJttbar'] # HTdnnL
 
 print taglist, algolist
 
@@ -123,7 +128,7 @@ def getNormUnc(hist,ibin,modelingUnc):
 def formatUpperHist(histogram,th1hist):
 	histogram.GetXaxis().SetLabelSize(0)
 	lowside = th1hist.GetBinLowEdge(1)
-	if iPlot=='ST': lowside = th1hist.GetBinLowEdge(8)-50.0
+	#if iPlot=='ST': lowside = th1hist.GetBinLowEdge(8)-50.0
 	highside = th1hist.GetBinLowEdge(th1hist.GetNbinsX()+1)
 	if iPlot=='dnnLargest': highside = th1hist.GetBinLowEdge(7)-0.1
 	histogram.GetXaxis().SetRangeUser(lowside,highside)
@@ -968,11 +973,18 @@ for tag in tagList:
 	
 	if blind == False and not doRealPull:
 		lPad.cd()
-		pullmerged=hDatamerged.Clone(hDatamerged.GetName()+"pullmerged")
-		pullmerged.Divide(hDatamerged, bkgHTmerged)
-		for binNo in range(0,hDatamerged.GetNbinsX()+2):
-			if bkgHTmerged.GetBinContent(binNo)!=0:
-				pull.SetBinError(binNo,hDatamerged.GetBinError(binNo)/bkgHTmerged.GetBinContent(binNo))
+		pullmerged=bkgHTmerged.Clone(hDatamerged.GetName()+"pullmerged")
+                #scale = str(hDatamerged.Integral()/bkgHTmerged.Integral())
+                #print 'SCALING TOTAL BACKGOUND FOR RATIO: data =',hDatamerged.Integral(),', mc =',bkgHTmerged.Integral()
+                #pullmerged.Scale(hDatamerged.Integral()/bkgHTmerged.Integral())
+		pullmerged.Divide(hDatamerged, pullmerged)                
+                #if 'probj' in iPlot:
+                #        print 'probjratio = {'
+                #        for binNo in range(0,hDatamerged.GetNbinsX()+2):
+                #                print str(pullmerged.GetBinContent(binNo))+','
+                #                if bkgHTmerged.GetBinContent(binNo)!=0:
+                #                        pullmerged.SetBinError(binNo,hDatamerged.GetBinError(binNo)/bkgHTmerged.GetBinContent(binNo))
+                #        print '};'
 		pullmerged.SetMaximum(3)
 		pullmerged.SetMinimum(0)
 		pullmerged.SetFillColor(1)
@@ -1030,6 +1042,8 @@ for tag in tagList:
 		pullLegendmerged.SetLineStyle(0)
 		pullLegendmerged.SetBorderSize(0)
 		pullLegendmerged.SetTextFont(42)
+                #pullLegendmerged.AddEntry(pullmerged,"Data/(MC*"+scale+")","pl")
+                pullLegendmerged.AddEntry(pullmerged,"Data/MC","pl")
 		if not doOneBand: pullLegendmerged.AddEntry(pullUncBandStat , "Bkg. uncert. (shape syst.)" , "f")
 		if not doOneBand: pullLegendmerged.AddEntry(pullUncBandNorm , "Bkg. uncert. (shape #oplus norm. syst.)" , "f")
 		if not doOneBand: pullLegendmerged.AddEntry(pullUncBandTot , "Bkg. uncert. (stat. #oplus all syst.)" , "f")

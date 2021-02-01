@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import os,sys,time,math,datetime,pickle,itertools,fnmatch
-from ROOT import gROOT,TFile,TH1F
+from ROOT import gROOT,TFile,TH1F, TH2D
 parent = os.path.dirname(os.getcwd())
 sys.path.append(parent)
 from weights import *
@@ -13,11 +13,11 @@ start_time = time.time()
 
 lumiStr = str(targetlumi/1000).replace('.','p') # 1/fb
 
-region='PS' #PS,SR,TTCR,WJCR,CR
+region='TR' #PS,SR,TTCR,WJCR,CR
 isCategorized=False
 pfix='templates'+region
 if not isCategorized: pfix='kinematics'+region
-pfix+='_TESTwithweight'#_July2019_With_Uncertainties
+pfix+='_Nov2020TT_HTcorr2D'
 outDir = os.getcwd()+'/'+pfix+'/'
 
 doCombineTemplates = False #run once with true if SR is catagorized
@@ -32,9 +32,14 @@ doAllSys = True
 addCRsys = False
 doPDF = False
 if isCategorized: doPDF=True
-systematicList = ['muRFcorrd','trigeffEl','trigeffMu','pileup','jec','btag','jsf','Teff','Tmis','Heff','Hmis','Zeff','Zmis','Weff','Wmis','Beff','Bmis','Jeff','Jmis','jer','ltag']#,'toppt']
-if isCategorized: systematicList = ['muRFcorrd','muR','muF','trigeffEl','trigeffMu','pileup','jec','btag','jsf','Teff','Tmis','Heff','Hmis','Zeff','Zmis','Weff','Wmis','Beff','Bmis','Jeff','Jmis','jer','ltag']
 normalizeRENORM_PDF = False #normalize the renormalization/pdf uncertainties to nominal templates --> normalizes signal processes only !!!!
+systematicList = ['muRFcorrd','trigeffEl','trigeffMu','pileup','prefire','jec','btag','jsf','Teff','Tmis','Heff','Hmis','Zeff','Zmis','Weff','Wmis','Beff','Bmis','Jeff','Jmis','jer','ltag','toppt']
+if '2D' in outDir: 
+        systematicList.remove('btag')
+        systematicList.remove('ltag')
+if isCategorized: 
+        systematicList.append('muR')
+        systematicList.append('muF')
 		       
 bkgGrupList = ['top','ewk','qcd']
 bkgProcList = ['TTJets','WJets','ZJets','qcd','TTV','T']
@@ -42,26 +47,23 @@ bkgProcs = {}
 bkgProcs['WJets']  = ['WJetsMG400','WJetsMG600','WJetsMG800','WJetsMG1200','WJetsMG2500'] #'WJetsMG200',
 bkgProcs['ZJets']  = ['DYMG400','DYMG600','DYMG800','DYMG1200','DYMG2500'] #'DYMG200'
 bkgProcs['VV']     = ['WW','WZ','ZZ']
-bkgProcs['TTV']    = ['TTWl','TTZl','TTHB','TTHnoB']#'TTwq','TTZq']
-#bkgProcs['TTJets'] = ['TTJetsSemiLep0','TTJetsSemiLep700','TTJetsSemiLep1000','TTJetsHad0','TTJetsHad700','TTJetsHad1000',
-#		      'TTJets2L2nu0','TTJets2L2nu700','TTJets2L2nu1000','TTJetsPH700mtt','TTJetsPH1000mtt']
-bkgProcs['TTJets'] = ['TTJets0','TTJets700','TTJets1000','TTJetsPS0','TTJetsPS700','TTJetsPS1000',
-		      'TTJetsPH700mtt','TTJetsPH1000mtt']
+bkgProcs['TTV']    = ['TTWl','TTZl','TTHB','TTHnoB']
+bkgProcs['TTJets'] = ['TTJetsSemiLep0','TTJetsSemiLep700','TTJetsSemiLep1000','TTJetsHad0','TTJetsHad700','TTJetsHad1000',
+		      'TTJets2L2nu0','TTJets2L2nu700','TTJets2L2nu1000','TTJetsPH700mtt','TTJetsPH1000mtt']
 bkgProcs['T']      = ['Tt','Tbt','Ts','TtW','TbtW']
 bkgProcs['qcd'] = ['QCDht500','QCDht700','QCDht1000','QCDht1500','QCDht2000']#'QCDht200',300 removed due to low # of events
 bkgProcs['top'] = bkgProcs['TTJets']+bkgProcs['T']+bkgProcs['TTV']
 bkgProcs['ewk'] = bkgProcs['WJets']+bkgProcs['ZJets']+bkgProcs['VV'] 
 
-if isCategorized and region == 'SR':
-	bkgProcs['qcd'].remove('QCDht500')
-	bkgProcs['qcd'].remove('QCDht700')
-	bkgProcs['qcd'].remove('QCDht1000')
+## I can't remember why we did this, so let's hold off and see if it's a problem
+#if isCategorized and region == 'SR':
+#	bkgProcs['qcd'].remove('QCDht500')
+#	bkgProcs['qcd'].remove('QCDht700')
+#	bkgProcs['qcd'].remove('QCDht1000')
 
 dataList = [
 	'DataEBCDEFG',
 	'DataMBCDEFG'
-	#'Data18EG',
-	#'Data18MU',
 	]
 
 topptProcs = ['top','TTJets']
@@ -92,8 +94,7 @@ elif whichSignal=='BB':
 if not doBRScan: nBRconf=1
 
 isEMlist = ['E','M']
-#isEMlist =['E','M','L']
-#isEMlist =['L']
+if '2D' in outDir: isEMlist =['L']
 algolist = ['all']
 if isCategorized or 'algos' in region or 'SR' in region: algolist = ['DeepAK8']#,'BEST'],'DeepAK8DC']
 taglist = ['all']
@@ -104,7 +105,9 @@ if isCategorized:
 		if whichSignal=='BB':
 			taglist=['taggedtWtW','taggedbZtW','taggedbHtW','notVbH','notVbZ','notVtW','notV2pT','notV01T2pH','notV01T1H','notV1T0H','notV0T0H1pZ','notV0T0H0Z2pW','notV0T0H0Z01W']
 
-        elif 'CR' in region: taglist=['dnnLargeT','dnnLargeH','dnnLargeW','dnnLargeZ','dnnLargeB','dnnLargeJwjet','dnnLargeJttbar']
+        elif 'CR' in region: 
+                #taglist=['dnnLargeT','dnnLargeH','dnnLargeW','dnnLargeZ','dnnLargeB','dnnLargeJwjet','dnnLargeJttbar'] #HTNtag
+                taglist=['dnnLargeTHZWB','dnnLargeJwjet','dnnLargeJttbar'] #HTdnnL
         else: taglist = ['all']
 
 	
@@ -523,10 +526,6 @@ for iPlot in iPlotList:
 		for key in sighists.keys(): sighists[key].Scale(lumiScaleCoeff)
 
 	checkprint = False
-        #print bkghists
-        #print datahists
-#	print sighists
-	#print 'sighists check:'
 	for key in sighists:
 		if 'MET_' in key and 'TTM800' in key: print key
 	print "       MAKING CATEGORIES FOR TOTAL SIGNALS ..."
@@ -534,10 +533,10 @@ for iPlot in iPlotList:
 		iPlot=iPlot.replace('Tp','Bp')
         	iPlot=iPlot.replace('DnnTTbar','DnnTTbarBB')
         	iPlot=iPlot.replace('DnnWJets','DnnWJetsBB') 
-	try:
-		makeThetaCats(datahists,sighists,bkghists,iPlot)
-	except:
-		print 'makeThetaCats failed for iPlot:',iPlot
-		pass
+        #try:
+        makeThetaCats(datahists,sighists,bkghists,iPlot)
+	#except:
+	#	print 'makeThetaCats failed for iPlot:',iPlot
+	#	pass
 
 print("--- %s minutes ---" % (round((time.time() - start_time)/60,2)))

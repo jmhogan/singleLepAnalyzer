@@ -205,11 +205,18 @@ samples = {
 'TTJetsPS0':'TT_TuneCUETP8M2T4_PSweights_13TeV-powheg-pythia8_Mtt0to700',
 'TTJetsPS700':'TT_TuneCUETP8M2T4_PSweights_13TeV-powheg-pythia8_Mtt700to1000',
 'TTJetsPS1000':'TT_TuneCUETP8M2T4_PSweights_13TeV-powheg-pythia8_Mtt1000toInf',
-#'TTJets2L2nu0':'TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8_Mtt0to700',
-#'TTJets2L2nu700':'TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8_Mtt700to1000',
-#'TTJets2L2nu1000':'TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8_Mtt1000toInf',
 'TTJetsPH700mtt':'TT_Mtt-700to1000_TuneCUETP8M2T4_13TeV-powheg-pythia8',
 'TTJetsPH1000mtt':'TT_Mtt-1000toInf_TuneCUETP8M2T4_13TeV-powheg-pythia8',
+
+'TTJetsHad0':'TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8_Mtt0to700',
+'TTJetsHad700':'TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8_Mtt700to1000',
+'TTJetsHad1000':'TTToHadronic_TuneCP5_PSweights_13TeV-powheg-pythia8_Mtt1000toInf',
+'TTJetsSemiLep0':'TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8_Mtt0to700',
+'TTJetsSemiLep700':'TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8_Mtt700to1000',
+'TTJetsSemiLep1000':'TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8_Mtt1000toInf',
+'TTJets2L2nu0':'TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8_Mtt0to700',
+'TTJets2L2nu700':'TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8_Mtt700to1000',
+'TTJets2L2nu1000':'TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8_Mtt1000toInf',
 
 
 
@@ -217,7 +224,6 @@ samples = {
 #'TTJetsPH':'TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8',
 #'TTWH':'TTWH_TuneCP5_13TeV-madgraph-pythia8',
 #'TTWq':'TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8',
-
 
 }
 

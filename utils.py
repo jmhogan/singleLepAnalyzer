@@ -56,11 +56,14 @@ def readTreeNominal(sample,step1Dir):
 	if not EOSpathExists(step1Dir[23:]+'/',pathstring0) and not EOSpathExists(step1Dir[23:]+'/',pathstring1): 
 		print "Error: path does not exist! Aborting ... no",pathstring0,"nor",pathstring1
 		os._exit(1)
+        useNumbers = False
+        if EOSpathExists(step1Dir[23:]+'/',pathstring1): useNumbers = True
 	rootfiles = EOSlist_root_files(step1Dir[23:])	
 
 	tChain = TChain('ljmet')
 	for i in range(0,len(rootfiles)):
 		if sample not in rootfiles[i]: continue
+                if useNumbers and pathstring0 in rootfiles[i]: continue
 		tChain.Add(rootfiles[i])
 	return tChain 
 
@@ -70,11 +73,14 @@ def readTreeShift(sample,shift,step1Dir):
         if not EOSpathExists(step1Dir[23:]+'/',pathstring0) and not EOSpathExists(step1Dir[23:]+'/',pathstring1):
 		print "Error: path does not exist! Aborting ... no",pathstring0,"nor",pathstring1
 		os._exit(1)
+        useNumbers = False
+        if EOSpathExists(step1Dir[23:]+'/',pathstring1): useNumbers = True
 	rootfiles = EOSlist_root_files(step1Dir[23:])	
 
 	tChain = TChain('ljmet_'+shift)
 	for i in range(0,len(rootfiles)):
 		if sample not in rootfiles[i]: continue
+                if useNumbers and pathstring0 in rootfiles[i]: continue
 		tChain.Add(rootfiles[i])
 	return tChain 
 
